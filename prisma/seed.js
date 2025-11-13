@@ -1,0 +1,90 @@
+const { PrismaClient } = require("@prisma/client");
+
+const prisma = new PrismaClient();
+
+const foods = [
+{
+    name: "Fried Rice and Chicken",
+    imageUrl: "/fried_rice.jpg",
+    packages: [
+      {id: 1, name: "Small Pack", price: 100 },
+      {id: 2, name: "Medium Pack", price: 150 },
+      {id: 3, name: "Large Pack", price: 200 }
+    ]
+  },
+  {
+    name: "Banku with Tilapia",
+    imageUrl: "/banku.jpg",
+    packages: [
+      { name: "Small Pack", price: 80 },
+      { name: "Medium Pack", price: 120 },
+      { name: "Large Pack", price: 160 }
+    ]
+  },
+  {
+    name: "Classic Beef Burger",
+    imageUrl: "/burger.jpg",
+    packages: [
+      { name: "Single", price: 90 },
+      { name: "Double", price: 130 },
+      { name: "Triple", price: 170 }
+    ]
+  },
+  {
+    name: "Fried Yam and Fish",
+    imageUrl: "/fried_yam.jpg",
+    packages: [
+      { name: "Small Pack", price: 70 },
+      { name: "Medium Pack", price: 100 },
+      { name: "Large Pack", price: 140 }
+    ]
+  },
+  {
+    name: "Jollof Rice and Chicken",
+    imageUrl: "/jollof.jpg",
+    packages: [
+      { name: "Small Pack", price: 90 },
+      { name: "Medium Pack", price: 130 },
+      { name: "Large Pack", price: 170 }
+    ]
+  },
+  {
+    name: "Spicy Noodles with Egg",
+    imageUrl: "/noodles.jpg",
+    packages: [
+      { name: "Small Pack", price: 60 },
+      { name: "Medium Pack", price: 90 },
+      { name: "Large Pack", price: 120 }
+    ]
+  }
+];
+
+async function main() {
+    console.log("Seeding database...");
+
+    for (const food of foods) {
+        await prisma.food.create({
+            data: {
+                name: food.name,
+                imageUrl: food.imageUrl,
+                packages: {
+                    create: food.packages.map((pkg) => ({
+                        size: pkg.name,
+                        price: pkg.price,
+                    })),
+                },
+            },
+        });
+    }
+    console.log("Seeding completed.✅");
+}
+
+main()
+    .catch((e) => {
+        console.error(e);
+        process.exit(1);
+    })
+    .finally(async () => {
+        await prisma.$disconnect();
+    }
+);
