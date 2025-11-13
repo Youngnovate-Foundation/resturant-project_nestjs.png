@@ -1,7 +1,7 @@
 export const foods = [
   {
     name: "Fried Rice and Chicken",
-    image: "/fried_rice.jpg",
+    imageUrl: "/fried_rice.jpg",
     packages: [
       {id: 1, name: "Small Pack", price: 100 },
       {id: 2, name: "Medium Pack", price: 150 },
@@ -10,7 +10,7 @@ export const foods = [
   },
   {
     name: "Banku with Tilapia",
-    image: "/banku.jpg",
+    imageUrl: "/banku.jpg",
     packages: [
       { name: "Small Pack", price: 80 },
       { name: "Medium Pack", price: 120 },
@@ -19,7 +19,7 @@ export const foods = [
   },
   {
     name: "Classic Beef Burger",
-    image: "/burger.jpg",
+    imageUrl: "/burger.jpg",
     packages: [
       { name: "Single", price: 90 },
       { name: "Double", price: 130 },
@@ -28,7 +28,7 @@ export const foods = [
   },
   {
     name: "Fried Yam and Fish",
-    image: "/fried_yam.jpg",
+    imageUrl: "/fried_yam.jpg",
     packages: [
       { name: "Small Pack", price: 70 },
       { name: "Medium Pack", price: 100 },
@@ -37,7 +37,7 @@ export const foods = [
   },
   {
     name: "Jollof Rice and Chicken",
-    image: "/jollof.jpg",
+    imageUrl: "/jollof.jpg",
     packages: [
       { name: "Small Pack", price: 90 },
       { name: "Medium Pack", price: 130 },
@@ -46,7 +46,7 @@ export const foods = [
   },
   {
     name: "Spicy Noodles with Egg",
-    image: "/noodles.jpg",
+    imageUrl: "/noodles.jpg",
     packages: [
       { name: "Small Pack", price: 60 },
       { name: "Medium Pack", price: 90 },

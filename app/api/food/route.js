@@ -1,16 +1,17 @@
 import { NextResponse } from "next/server";
+const { PrismaClient } = require("@prisma/client");
+
+const prisma = new PrismaClient();
 
 export async function GET(request, { params }) {
-    const food ={
-        name: "Fried Rice and Chicken",
-        image: "/fried_rice.jpg",
-        packages: [
-          {id: 1, name: "Small Pack", price: 100 },
-          {id: 2, name: "Medium Pack", price: 150 },
-          {id: 3, name: "Large Pack", price: 200 }
-        ]
-    };
-    
-    
-    return NextResponse.json(food)
+  try {
+    const foods = await prisma.Food.findMany(
+      { include: { packages: true } }
+    );
+    console.log(foods);
+    return NextResponse.json(foods); // ✅ ensures JSON is returned
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json({ error: "Failed to fetch foods" }, { status: 500 });
+  }
 }

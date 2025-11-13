@@ -29,8 +29,8 @@ const [order,setOrder] = useState(
   }
 );
 
-console.log("Food object:", food);
-console.log(order);
+//console.log("Food object:", food);
+//console.log(order);
 
 
 const updateFood =(id) =>{
@@ -107,7 +107,7 @@ const submitOrder = async () => {
           <DialogHeader>
             <DialogTitle>{food.name}</DialogTitle>
             <form onSubmit={handleSubmit} className="space-y-2">
-              <Image  src={food.image} alt={food.name} width={500} height={20}
+              <Image  src={food.imageUrl} alt={food.name} width={500} height={20}
               className="w-full h-52"/>
               <div className="my-4">
                 <h2 className="font-bold text-black text-xl">CHOOSE PACKAGE</h2>

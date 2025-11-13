@@ -2,6 +2,7 @@
 import React, { use, useState } from "react";
 import Image from "next/image";
 import Modal from "./Modal";
+import { foods } from "@/utils/foods";
 
 const FoodCard = ({food}) => {
    const lowestPackagePrice = food.packages[0].price;
@@ -12,7 +13,7 @@ const FoodCard = ({food}) => {
         <>
         <div onClick={()=> setOpen(true)} className="bg-white w-72 flex flex-col justify-center items-center shadow-md rounded-lg gap-4 h-72">
             <Image
-                src={food.image}
+                src={food.imageUrl}
                 alt={food.name}
                 width={160}
                 height={160}
