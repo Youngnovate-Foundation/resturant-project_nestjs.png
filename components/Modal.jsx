@@ -122,7 +122,7 @@ const submitOrder = async () => {
                           : 'border-gray-200'
                       }`}
                     >
-                      <h3 className="font-semibold">{pkg.name}</h3>
+                      <h3 className="font-semibold">{pkg.size}</h3>
                     </div>
                   ))}
                 </div>

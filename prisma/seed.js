@@ -60,24 +60,31 @@ const foods = [
 ];
 
 async function main() {
-    console.log("Seeding database...");
+  console.log("Seeding database...");
 
-    for (const food of foods) {
-        await prisma.food.create({
-            data: {
-                name: food.name,
-                imageUrl: food.imageUrl,
-                packages: {
-                    create: food.packages.map((pkg) => ({
-                        size: pkg.name,
-                        price: pkg.price,
-                    })),
-                },
-            },
-        });
-    }
-    console.log("Seeding completed.✅");
+  // 🧹 Clear existing data first
+  await prisma.order.deleteMany();
+  await prisma.package.deleteMany();
+  await prisma.food.deleteMany();
+
+  for (const food of foods) {
+    await prisma.food.create({
+      data: {
+        name: food.name,
+        imageUrl: food.imageUrl,
+        packages: {
+          create: food.packages.map((pkg) => ({
+            size: pkg.name,
+            price: pkg.price,
+          })),
+        },
+      },
+    });
+  }
+
+  console.log("Seeding completed ✅");
 }
+
 
 main()
     .catch((e) => {
