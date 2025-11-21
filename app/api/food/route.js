@@ -8,7 +8,7 @@ export async function GET(request, { params }) {
     const foods = await prisma.Food.findMany(
       { include: { packages: true } }
     );
-    console.log(foods);
+    // console.log(foods);
     return NextResponse.json(foods); // ✅ ensures JSON is returned
   } catch (error) {
     console.error(error);

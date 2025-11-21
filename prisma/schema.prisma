@@ -10,7 +10,9 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  // connection URL moved to prisma.config.ts; pass the connection via an adapter for PrismaClient
+  // or provide accelerateUrl when using Prisma Accelerate.
+  // See: https://pris.ly/d/config-datasource and https://pris.ly/d/prisma7-client-config
 }
 
 model Food {

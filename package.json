@@ -5,7 +5,6 @@
   "prisma": {
     "seed": "node prisma/seed.js"
   },
-  
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -16,6 +15,7 @@
   "dependencies": {
     "@prisma/client": "^6.19.0",
     "@radix-ui/react-dialog": "^1.1.15",
+    "@tanstack/react-query": "^5.90.9",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.547.0",

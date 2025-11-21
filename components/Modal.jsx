@@ -10,6 +10,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import Image from "next/image";
+import { useMutation } from "@tanstack/react-query";
 
 const Modal = ({open, setOpen, food}) => {
   
@@ -97,6 +98,31 @@ const submitOrder = async () => {
     submitOrder();
   };
 
+  const { mutate, isPending } = useMutation({
+    mutationFn: async (orderData) => {
+      const res = await fetch("/api/order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(orderData),
+      });
+      if (!res.ok) throw new Error("Failed to submit order");
+
+      return res.json(); // <-- REQUIRED to avoid “body already read”
+    },
+    onSuccess: () => {
+      alert("Order submitted successfully!");
+      setOpen(false);
+    },
+    onError: (error) => {
+      alert(`Error submitting order: ${error.message}`);
+    },
+  });
+
+const submitFunction= (e) =>{
+    e.preventDefault();
+    mutate(order);
+};
+
   return (
     
         
@@ -106,7 +132,7 @@ const submitOrder = async () => {
         <DialogContent className="sm:max-h-[97%] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{food.name}</DialogTitle>
-            <form onSubmit={handleSubmit} className="space-y-2">
+            <form onSubmit={submitFunction} className="space-y-2">
               <Image  src={food.imageUrl} alt={food.name} width={500} height={20}
               className="w-full h-52"/>
               <div className="my-4">
@@ -141,6 +167,8 @@ const submitOrder = async () => {
               </div>
               
               <input className="bg-amber-500 mx-auto px-2 py-1 rounded-md" type="submit" value="submit" />
+
+              {isPending && <div>Submitting order to Backend...</div>}
             </form>
           </DialogHeader>
         </DialogContent>

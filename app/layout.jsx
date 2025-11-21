@@ -2,6 +2,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer"
+import Provider from "../provider/ReactQueryProvider";
 
 
 export const metadata = {
@@ -13,9 +14,12 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className="antialiased text-lg bg-gray-100 min-h-screen flex flex-col">
-        <Navbar />
+        <Provider>
+         <Navbar />
         <main className="flex-1">{children}</main>
         <Footer />
+        </Provider>
+       
       </body>
     </html>
   );
