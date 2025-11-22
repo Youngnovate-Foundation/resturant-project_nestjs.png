@@ -22,7 +22,7 @@ const Modal = ({open, setOpen, food}) => {
 const [order,setOrder] = useState(
   {
     //foodId, packageId,location,phone number and the notes
-    //foodId: "",
+    foodId: food.id,
     packageId: null,
     location: "",
     phone: "",
@@ -78,50 +78,48 @@ const submitOrder = async () => {
   console.log("Submitting order:", order);
 
   // If you later add a server API, uncomment the fetch below to POST the order
-  // try {
-  //   const res = await fetch('/api/orders', {
-  //     method: 'POST',
-  //     headers: { 'Content-Type': 'application/json' },
-  //     body: JSON.stringify(order),
-  //   });
-  //   const data = await res.json();
-  //   console.log('Server response:', data);
-  // } catch (err) {
-  //   console.error('Failed to submit order', err);
-  // }
+  try {
+    const res = await fetch('/api/order', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(order),
+    });
+    const data = await res.json();
+    console.log('Server response:', data);
+  } catch (err) {
+    console.error('Failed to submit order', err);
+  }
 };
 
 
 
-  const handleSubmit = (e) => {
+  const submitFunction = (e) => {
     e.preventDefault();
     submitOrder();
   };
 
-  const { mutate, isPending } = useMutation({
-    mutationFn: async (orderData) => {
-      const res = await fetch("/api/order", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(orderData),
-      });
-      if (!res.ok) throw new Error("Failed to submit order");
+  const {mutate,isPending}=useMutation({
+  mutationFn: async (orderData) => {
+    const res = await fetch('/api/order', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(orderData),
+    });
 
-      return res.json(); // <-- REQUIRED to avoid “body already read”
-    },
-    onSuccess: () => {
-      alert("Order submitted successfully!");
-      setOpen(false);
-    },
-    onError: (error) => {
-      alert(`Error submitting order: ${error.message}`);
-    },
-  });
+    if (!res.ok)
+      throw new Error('Failed to submit order');
 
-const submitFunction= (e) =>{
-    e.preventDefault();
-    mutate(order);
-};
+    return res.json();  // 🔥 THIS IS THE FIX
+  },
+  onSuccess: () => {
+    alert('Order submitted successfully!');
+    setOpen(false);
+  },
+  onError: (error) => {
+    alert(`Error submitting order: ${error.message}`);
+  }
+});
+
 
   return (
     
@@ -165,7 +163,12 @@ const submitFunction= (e) =>{
                  onChange={(e) => updateNotes(e.target.value)}
                 value={order.notes}    type="text"  className="border border-gray-200 w-full py-2 px-2"/>
               </div>
-              
+                <div className="my-4">
+                  <h2 className="font-bold text-black text-xl">PHONE NUMBER</h2>
+                <input
+                 onChange={(e) => updatePhone(e.target.value)}
+                value={order.phone}   type="tel"  className="border border-gray-200 w-full py-2 px-2"/>
+              </div>              
               <input className="bg-amber-500 mx-auto px-2 py-1 rounded-md" type="submit" value="submit" />
 
               {isPending && <div>Submitting order to Backend...</div>}

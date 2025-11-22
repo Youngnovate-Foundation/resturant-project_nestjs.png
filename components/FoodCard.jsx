@@ -4,14 +4,14 @@ import Image from "next/image";
 import Modal from "./Modal";
 import { foods } from "@/utils/foods";
 
-const FoodCard = ({food}) => {
+const FoodCard = ({food,onClick}) => {
    const lowestPackagePrice = food.packages[0].price;
    const [open, setOpen] = useState(false);
 
    
     return (
         <>
-        <div onClick={()=> setOpen(true)} className="bg-white w-72 flex flex-col justify-center items-center shadow-md rounded-lg gap-4 h-72">
+        <div onClick={onClick} className="bg-white w-72 flex flex-col justify-center items-center shadow-md rounded-lg gap-4 h-72">
             <Image
                 src={food.imageUrl}
                 alt={food.name}
@@ -23,7 +23,7 @@ const FoodCard = ({food}) => {
         <h4 className="text-amber-400">₵{lowestPackagePrice}</h4>
         </div>
 
-        <Modal food={food} open={open} setOpen={setOpen}/>
+        
         </>
     );
 };

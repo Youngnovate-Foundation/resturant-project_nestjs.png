@@ -10,9 +10,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  // connection URL moved to prisma.config.ts; pass the connection via an adapter for PrismaClient
-  // or provide accelerateUrl when using Prisma Accelerate.
-  // See: https://pris.ly/d/config-datasource and https://pris.ly/d/prisma7-client-config
+  url      = env("DATABASE_URL")
 }
 
 model Food {
@@ -32,6 +30,7 @@ model Order {
   package   Package? @relation(fields: [packageId], references: [id], onDelete: Cascade)
   location  String
   phone     String
+  isCompleted Boolean  @default(false)
   createdAt DateTime @default(now())
 }
 

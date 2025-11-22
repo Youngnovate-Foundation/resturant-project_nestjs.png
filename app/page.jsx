@@ -1,38 +1,32 @@
 "use client";
 import FoodCard from "@/components/FoodCard";
+import Modal from "@/components/Modal";
 import { useQuery } from "@tanstack/react-query";
+
 import { useEffect, useState } from "react";
 
 //import { foods } from "@/utils/foods";
 
 
 const page = () => {
-  //const [foods, setFoods] = useState("");
+  const {
+    isPending,
+    isError,
+    data: foods,
+    error,
+  } = useQuery({
+    queryKey: ["foods"],
+    queryFn: async () => {
+      const res = await fetch("/api/food/");
+      const data = await res.json();
+      return data;
+    },
+  });
+
+  const [open, setOpen] = useState(false);
+  const [selectedFood, setSelectedFood] = useState(null);
   
-    // useEffect(() => {
-    //   const fetchfoods = async () => {
-    //     const res = await fetch("/api/food/");
-    //     const data = await res.json();
-    //     setFoods(data);
-    //   };
-  
-    //   fetchfoods();
-    // }, []);
-    // //console.log(foods);
 
-      const { isPending, isError, data: foods, error } = useQuery({
-  queryKey: ["foods"],
-  queryFn:  async () => {
-        const res = await fetch("/api/food/");
-        const data = await res.json();
-        return res.json();
-       },
-});
-
-console.log(foods);
-
-
-    
   return (
     <div className="flex flex-wrap gap-8 justify-center items-center p-8 bg-gray-100">
       {isPending && (
@@ -45,9 +39,21 @@ console.log(foods);
       )}
       {isError && <div>Error: {error.message}</div>}
 
-      {foods?.length >= 1 && (
-        foods?.map((food, i) => <FoodCard food={food} key={i} />)
-      ) }
+      {foods?.length >= 1 &&
+        foods?.map((food, i) => (
+          <FoodCard
+            onClick={() => {
+              setSelectedFood(food);
+              setOpen(true);
+            }}
+            food={food}
+            key={i}
+          />
+        ))}
+
+      {selectedFood  && open && (
+        <Modal food={selectedFood} open={open} setOpen={setOpen} />
+      )   }
     </div>
   );
 };
