@@ -18,11 +18,11 @@ const page = () => {
   });
   
   const {mutate}=useMutation({
-  mutationFn: async (orderData) => {
+  mutationFn: async (id, isCompleted) => {
     const res = await fetch('/api/order', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(orderData),
+      body: JSON.stringify(id, isCompleted),
     });
 
     if (!res.ok)
@@ -30,13 +30,13 @@ const page = () => {
 
     return res.json();  // 🔥 THIS IS THE FIX
   },
-  onSuccess: () => {
-    alert('Order MARKED as completed successfully!');
-    //setOpen(false);
-  },
-  onError: (error) => {
-    alert(`Error submitting order: ${error.message}`);
-  }
+  // onSuccess: () => {
+  //   alert('Order MARKED as completed successfully!');
+  //   //setOpen(false);
+  // },
+  // onError: (error) => {
+  //   alert(`Error submitting order: ${error.message}`);
+  // }
 });
 
     useMutation;
