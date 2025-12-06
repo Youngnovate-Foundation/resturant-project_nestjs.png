@@ -127,7 +127,7 @@ const submitOrder = async () => {
       <Dialog open={open} onOpenChange={setOpen}>
         {/*The open and onOpenChange 
         <DialogTrigger>Click Me</DialogTrigger>*/}
-        <DialogContent className="sm:max-h-[97%] overflow-y-auto">
+        <DialogContent className="sm:max-h-[97%] overflow-y-auto ">
           <DialogHeader>
             <DialogTitle>{food.name}</DialogTitle>
             <form onSubmit={submitFunction} className="space-y-2">
@@ -169,7 +169,7 @@ const submitOrder = async () => {
                  onChange={(e) => updatePhone(e.target.value)}
                 value={order.phone}   type="tel"  className="border border-gray-200 w-full py-2 px-2"/>
               </div>              
-              <input className="bg-amber-500 mx-auto px-2 py-1 rounded-md" type="submit" value="submit" />
+             <input className="bg-amber-500 hover:bg-600 transition-colors duration-300 mx-auto px-4 py-2 rounded-md font-semibold text-white shadow-md cursor-pointer" type="submit" value="Submit" />
 
               {isPending && <div>Submitting order to Backend...</div>}
             </form>

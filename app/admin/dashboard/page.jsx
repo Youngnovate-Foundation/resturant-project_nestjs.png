@@ -47,7 +47,11 @@ const page = () => {
 
   return (
     <div className="p-6">
-      <h1 className="text-xl font-semibold mb-4">Orders</h1>
+      <div className=' bg-gray-100 p-10'>
+        <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
+        <p className='mt-2 text-gray-600'>Welcome, Admin!</p>
+      </div>
+      <span className="text-xl font-semibold mb-4 justify-center flex shadow-md rounded-full w-full bg-emerald-600">Orders</span>
       <div className="space-y-4">
         {isPending && (
           <div className="w-full flex justify-center py-10">
@@ -66,7 +70,7 @@ const page = () => {
             >
               <div>
                 <p>
-                  <strong>#{order.id + 1}</strong>
+                  <strong>#{order.id}</strong>
                 </p>
                 <p>
                   <strong>Food:</strong> {order.food.name}
