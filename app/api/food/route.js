@@ -3,7 +3,7 @@ const { PrismaClient } = require("@prisma/client");
 
 const prisma = new PrismaClient();
 
-export async function GET(request, { params }) {
+export async function GET() {
   try {
     const foods = await prisma.Food.findMany(
       { include: { packages: true } }

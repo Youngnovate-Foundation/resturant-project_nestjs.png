@@ -28,8 +28,9 @@ model Order {
   packageId Int?
   food      Food     @relation(fields: [foodId], references: [id], onDelete: Cascade)
   package   Package? @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  notes     String?
   location  String
-  phone     String
+  //phone     String
   isCompleted Boolean  @default(false)
   createdAt DateTime @default(now())
 }
@@ -42,3 +43,27 @@ model Package {
   food   Food    @relation(fields: [foodId], references: [id], onDelete: Cascade)
   orders Order[]
 }
+
+  model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  role      String   @default("USER") // USER or ADMIN
+  createdAt DateTime @default(now())
+}
+
+model PasswordReset {
+  id        Int      @id @default(autoincrement())
+  email     String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+//TODO: npx prisma generate
+//npx prisma db push
+
+
+// Add your models here and run `prisma db push` to apply them to the database
+// Learn more about Prisma models: https://pris.ly/d/prisma-models

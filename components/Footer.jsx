@@ -2,7 +2,7 @@ import React from "react";
 
 const Footer = () => {
     return (
-      <footer className="bg-gradient-to-r from-green-500 via-green-700 text-white text-center font-semibold py-6 mt-auto shadow-lg rounded-t-lg">
+      <footer className="bg-gradient-to-r from-orange-500 to-orange-700 text-white text-center font-semibold py-6 mt-auto shadow-lg rounded-t-lg">
         {" "}
         <p className="text-lg tracking-wide drop-shadow-md">
           {" "}

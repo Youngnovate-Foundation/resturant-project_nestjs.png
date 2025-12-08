@@ -25,7 +25,7 @@ const [order,setOrder] = useState(
     foodId: food.id,
     packageId: null,
     location: "",
-    phone: "",
+    // phone: "",
     notes: "",
   }
 );
@@ -57,12 +57,12 @@ const updateLocation =(user_location) =>{
 }
 
 
-const updatePhone =(user_phone) =>{
-  setOrder((prev) => ({
-    ...prev,
-    phone: user_phone
-  }));
-}
+// const updatePhone =(user_phone) =>{
+//   setOrder((prev) => ({
+//     ...prev,
+//     phone: user_phone
+//   }));
+// }
 
 const updateNotes =(user_notes) =>{
   setOrder((prev) => ({
@@ -163,12 +163,12 @@ const submitOrder = async () => {
                  onChange={(e) => updateNotes(e.target.value)}
                 value={order.notes}    type="text"  className="border border-gray-200 w-full py-2 px-2"/>
               </div>
-                <div className="my-4">
+                {/* <div className="my-4">
                   <h2 className="font-bold text-black text-xl">PHONE NUMBER</h2>
                 <input
                  onChange={(e) => updatePhone(e.target.value)}
                 value={order.phone}   type="tel"  className="border border-gray-200 w-full py-2 px-2"/>
-              </div>              
+              </div>               */}
              <input className="bg-amber-500 hover:bg-600 transition-colors duration-300 mx-auto px-4 py-2 rounded-md font-semibold text-white shadow-md cursor-pointer" type="submit" value="Submit" />
 
               {isPending && <div>Submitting order to Backend...</div>}

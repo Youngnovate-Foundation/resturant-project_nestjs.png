@@ -12,28 +12,28 @@ export default function SignupPage() {
         <input
           type="text"
           placeholder="Full Name"
-          className="w-full p-3 border rounded-md"
+          className="w-full p-3 border rounded-md focus:ring-2 focus:ring-orange-400"
         />
 
         <input
           type="email"
           placeholder="Email"
-          className="w-full p-3 border rounded-md"
+          className="w-full p-3 border rounded-md focus:ring-2 focus:ring-orange-400"
         />
 
         <input
           type="password"
           placeholder="Password"
-          className="w-full p-3 border rounded-md"
+          className="w-full p-3 border rounded-md focus:ring-2 focus:ring-orange-400"
         />
 
-        <button className="w-full bg-green-600 text-white py-3 rounded-md hover:bg-green-700">
+        <button className="w-full bg-orange-600 text-white py-3 rounded-md hover:bg-orange-700 transition">
           Sign Up
         </button>
 
         <p className="text-sm text-center">
           Already have an account?{" "}
-          <Link href="/auth/login" className="text-blue-600">
+          <Link href="/auth/login" className="text-blue-600 hover:underline">
             Login
           </Link>
         </p>

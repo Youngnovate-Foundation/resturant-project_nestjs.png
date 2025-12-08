@@ -1,114 +1,48 @@
 "use client"
-import React from 'react'
-import { useMutation, useQuery } from '@tanstack/react-query'
 
-const page = () => {
-     const {
-    isPending,
-    isError,
-    data: orders,
-    error,
-  } = useQuery({
-    queryKey: ["orders"],
+import { useQuery } from '@tanstack/react-query'
+
+export default function AdminDashboardPage() {
+  const {data: stats, isLoading} = useQuery({
+    queryKey: ['admin-stats'],
     queryFn: async () => {
-      const res = await fetch("/api/order");
-      const data = await res.json();
-      return data;
+      const res = await fetch('/api/admin/stats');
+      return res.json();
     },
   });
-  
-  const {mutate}=useMutation({
-  mutationFn: async (id, isCompleted) => {
-    const res = await fetch('/api/order', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(id, isCompleted),
-    });
 
-    if (!res.ok)
-      throw new Error('Failed to MARK order as completed');
-
-    return res.json();  // 🔥 THIS IS THE FIX
-  },
-  // onSuccess: () => {
-  //   alert('Order MARKED as completed successfully!');
-  //   //setOpen(false);
-  // },
-  // onError: (error) => {
-  //   alert(`Error submitting order: ${error.message}`);
-  // }
-});
-
-    useMutation;
-
-    if (orders){
-        console.log('Orders data:', orders);
-    }
-
-  return (
-    <div className="p-6">
-      <div className=' bg-gray-100 p-10'>
-        <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
-        <p className='mt-2 text-gray-600'>Welcome, Admin!</p>
-      </div>
-      <span className="text-xl font-semibold mb-4 justify-center flex shadow-md rounded-full w-full bg-emerald-600">Orders</span>
-      <div className="space-y-4">
-        {isPending && (
-          <div className="w-full flex justify-center py-10">
+  if (isLoading) {
+    return <div className="w-full flex justify-center py-10">
             <div className="p-4 rounded-xl shadow-md bg-white flex items-center space-x-3">
               <div className="animate-spin rounded-full h-6 w-6 border-4 border-gray-300 border-t-blue-500"></div>
               <span className="font-medium text-gray-700">Loading...</span>
             </div>
           </div>
-        )}
+  }
 
-        {orders &&
-          orders.map((order) => (
-            <div
-              key={order.id}
-              className="flex items-center justify-between p-3 border rounded"
-            >
-              <div>
-                <p>
-                  <strong>#{order.id}</strong>
-                </p>
-                <p>
-                  <strong>Food:</strong> {order.food.name}
-                </p>
-                <p>
-                  <strong>Package:</strong> {order.package.size}
-                </p>
-                <p>
-                  <strong>Location:</strong> {order.location}
-                </p>
-                <p>
-                  <strong>Phone:</strong> {order.phone}
-                </p>
-              </div>
-
-              <div>
-                <button
-                  className={`px-4 py-2 rounded cursor-pointer text-white 
-    ${
-      order.isCompleted
-        ? "bg-blue-500 hover:bg-blue-600"
-        : "bg-green-500 hover:bg-green-600"
-    }`}
-                  onClick={() => {
-                    mutate({ id: order.id, isCompleted: !order.isCompleted });
-                  }}
-                >
-                  {order.isCompleted ? "Completed" : "Mark as Completed"}
-                </button>
-              </div>
-            </div>
-          ))}
-      </div>{" "}
-      {/* ← THIS was missing */}
+  return (
+    <div className="space-y-6">
+      {/* Stats Row */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        <div className="bg-white shadow-md p-6 rounded-xl">
+          <p className="text-sm text-gray-500">Completed Orders</p>
+          <h3 className="text-3xl font-bold text-gray-800">
+            {stats?.completedOrders ?? 0}
+          </h3>
+        </div>
+        <div className="bg-white shadow-md p-6 rounded-xl">
+          <p className="text-sm text-gray-500">Foods Available</p>
+          <h3 className="text-3xl font-bold text-gray-800">
+            {stats?.foodCount ?? 0}
+          </h3>
+        </div>
+        <div className="bg-white shadow-md p-6 rounded-xl">
+          <h2 className="text-xl font-bold mb-4">Recent Orders</h2>
+          <p className="text-sm text-gray-500">
+            Go to the Orders page to manage.
+          </p>
+        </div>
+      </div>
     </div>
   );
-};
-
-
-
-export default page
+}

@@ -32,7 +32,7 @@ export async function POST(req) {
 
     console.log('Received order data:', data);
 
-    if (!data.foodId ||!data.packageId || !data.location || !data.phone) {
+    if (!data.foodId ||!data.packageId || !data.location ) {
         return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
@@ -41,8 +41,8 @@ export async function POST(req) {
         foodId: data.foodId,
         packageId: data.packageId,
         location: data.location,
-        phone: data.phone,
-        //notes: data.notes,
+        // phone: data.phone,
+        notes: data.notes,
         },
     });
 

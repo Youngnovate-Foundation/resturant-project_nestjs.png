@@ -13,7 +13,7 @@ CREATE TABLE "Order" (
     "foodId" INTEGER NOT NULL,
     "packageId" INTEGER,
     "location" TEXT NOT NULL,
-    "phone" TEXT NOT NULL,
+    "notes" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "Order_pkey" PRIMARY KEY ("id")
