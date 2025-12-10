@@ -39,8 +39,8 @@ export default function AdminOrdersPage() {
             <tr>
               <th className="p-3 text-left">Food</th>
               <th className="p-3 text-left">Location</th>
-              <th className="p-3 text-left">Phone</th>
-              <th className="p-3 text-left">Status</th>
+              <th className="p-3 text-left">Email/Phone</th>
+              <th className="p-3 text-left">Notes</th>
               <th className="p-3 text-left">Actions</th>
             </tr>
           </thead>
@@ -50,7 +50,8 @@ export default function AdminOrdersPage() {
               <tr key={order.id} className="border-b">
                 <td className="p-3">{order.food?.name}</td>
                 <td className="p-3">{order.location}</td>
-                <td className="p-3">{order.phone}</td>
+                <td className="p-3">{order.phone || order.email}</td>
+                <td className="p-3">{order.notes}</td>
 
                 <td className="p-3">
                   {order.isCompleted ? (
@@ -75,7 +76,7 @@ export default function AdminOrdersPage() {
                     className={`px-3 py-2 rounded-md text-white ${
                       order.isCompleted
                         ? "bg-gray-600 hover:bg-gray-700"
-                        : "bg-blue-600 hover:bg-blue-700"
+                        : "bg-green-600 hover:bg-green-700"
                     }`}
                   >
                     {order.isCompleted

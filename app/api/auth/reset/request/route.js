@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+import prisma from "@prisma/client";
 import crypto from "crypto";
 
 export async function POST(req) {

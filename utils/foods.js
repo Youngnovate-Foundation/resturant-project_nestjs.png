@@ -3,9 +3,9 @@ export const foods = [
     name: "Fried Rice and Chicken",
     imageUrl: "/fried_rice.jpg",
     packages: [
-      {id: 1, name: "Small Pack", price: 100 },
-      {id: 2, name: "Medium Pack", price: 150 },
-      {id: 3, name: "Large Pack", price: 200 }
+      { id: 1, name: "Small Pack", price: 100 },
+      { id: 2, name: "Medium Pack", price: 150 },
+      { id: 3, name: "Large Pack", price: 200 }
     ]
   },
   {
@@ -52,8 +52,86 @@ export const foods = [
       { name: "Medium Pack", price: 90 },
       { name: "Large Pack", price: 120 }
     ]
+  },
+
+  // ➕ NEW ITEMS ADDED
+  {
+    name: "Kenkey with Fried Fish",
+    imageUrl: "/kenkey_f.jpg",
+    packages: [
+      { name: "Small Pack", price: 70 },
+      { name: "Medium Pack", price: 100 },
+      { name: "Large Pack", price: 140 }
+    ]
+  },
+  {
+    name: "Yam with Palaver Sauce",
+    imageUrl: "/yam_ps.jpg",
+    packages: [
+      { name: "Small Pack", price: 80 },
+      { name: "Medium Pack", price: 120 },
+      { name: "Large Pack", price: 160 }
+    ]
+  },
+  {
+    name: "Waakye with Fish",
+    imageUrl: "/waakye.jpg",
+    packages: [
+      { name: "Small Pack", price: 90 },
+      { name: "Medium Pack", price: 130 },
+      { name: "Large Pack", price: 170 }
+    ]
+  },
+  {
+    name: "Fufu with Light Soup",
+    imageUrl: "/fufu_soup.jpg",
+    packages: [
+      { name: "Small Pack", price: 100 },
+      { name: "Medium Pack", price: 140 },
+      { name: "Large Pack", price: 180 }
+    ]
   }
 ];
 
-// Example mapping:
-//foods.map(food => console.log(food.name));
+// DRINKS SECTION
+export const drinks = [
+  { name: "Coke", imageUrl: "/coke.jpg", price: 15 },
+  { name: "Energy Drink", imageUrl: "/energy_drink.jpg", price: 20 },
+  { name: "Fanta", imageUrl: "/fanta.jpg", price: 15 },
+  { name: "Prime", imageUrl: "/energy_prime.jpeg", price: 25 },
+  { name: "Pepsi", imageUrl: "/pepsi.jpg", price: 15 },
+  { name: "Sprite", imageUrl: "/sprite.jpg", price: 15 },
+  { name: "Water", imageUrl: "/water.jpg", price: 10 }
+];
+
+// OTHERS SECTION
+export const others = [
+  { name: "Yogurt", imageUrl: "/yogurt.jpeg", price: 18 },
+  { name: "Tea", imageUrl: "/tea.jpg", price: 10 },
+  { name: "Latte", imageUrl: "/latte.jpg", price: 20 },
+  { name: "Smoothies", imageUrl: "/smoothies.jpg", price: 25 },
+  { name: "Lemonade", imageUrl: "/lemonade.jpg", price: 15 },
+  { name: "Meat Pie", imageUrl: "/meat_pie.jpg", price: 12 },
+  { name: "Ice Cream", imageUrl: "/ice_cream.jpg", 
+    packages: [
+      { name: "Chocolate Flavor", price: 15 ,imageUrl: "/ice_cream_chocolate.jpg"},
+      { name: "Vanilla Flavor", price: 15, imageUrl: "/ice_cream_vanilla.jpg" },
+      { name: "Strawberry Flavor", price: 15, imageUrl: "/ice_cream_strawberry.jpg" }
+    ]
+   },
+  { name: "Juices", imageUrl: "/juices.jpg",
+    packages: [
+      { name: "Mango Juice", price: 15 },
+      { name: "Pineapple Juice", price: 15 },
+      { name: "Orange Juice", price: 15 }
+    ]
+   },
+  { name: "Hot Chocolate", imageUrl: "/hot-chocolate.jpg", price: 18 },
+  { name: "Cookies", imageUrl: "/cookies.jpg", price: 10 },
+  { name: "Cupcake", imageUrl: "/cupcake.jpg", price: 12 },
+  { name: "Coffee", imageUrl: "/coffee.jpg", price: 15 },
+  { name: "Chocolate Cake", imageUrl: "/chocolate_cake.jpg", price: 25 },
+  { name: "Cheesecake", imageUrl: "/cheesecake.jpg", price: 30 }
+];
+// COMBINED FOOD ITEMS
+export const allFoods = [...foods, ...drinks, ...others];
