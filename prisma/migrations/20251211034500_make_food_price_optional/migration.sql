@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Food" ALTER COLUMN "price" DROP NOT NULL;

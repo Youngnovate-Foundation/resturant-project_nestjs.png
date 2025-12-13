@@ -1,5 +1,4 @@
 const { PrismaClient } = require("@prisma/client");
-
 const prisma = new PrismaClient();
 
 const foods = [
@@ -97,19 +96,13 @@ const foods = [
   }
 ];
 
-// DRINKS SECTION
-export const drinks = [
-  { name: "Coke", imageUrl: "/coke.jpg", price: 15 },
-  { name: "Energy Drink", imageUrl: "/energy_drink.jpg", price: 20 },
-  { name: "Fanta", imageUrl: "/fanta.jpg", price: 15 },
-  { name: "Prime", imageUrl: "/energy_prime.jpeg", price: 25 },
-  { name: "Pepsi", imageUrl: "/pepsi.jpg", price: 15 },
-  { name: "Sprite", imageUrl: "/sprite.jpg", price: 15 },
-  { name: "Water", imageUrl: "/water.jpg", price: 10 }
+const users = [
+  { name: "Alice Johnson", email: "alicej", password: "alicepassword", role: "USER" },
+  { name: "Bob Smith", email: "bobpassword", password: "bobpassword", role: "USER" },
+  { name: "Aiden Brown", email: "admin@youngnovate.com", password: "adminpassword", role: "ADMIN" },
 ];
 
-// OTHERS SECTION
-export const others = [
+const others = [
   { name: "Yogurt", imageUrl: "/yogurt.jpeg", price: 18 },
   { name: "Tea", imageUrl: "/tea.jpg", price: 10 },
   { name: "Latte", imageUrl: "/latte.jpg", price: 20 },
@@ -135,41 +128,130 @@ export const others = [
   { name: "Cupcake", imageUrl: "/cupcake.jpg", price: 12 },
   { name: "Coffee", imageUrl: "/coffee.jpg", price: 15 },
   { name: "Chocolate Cake", imageUrl: "/chocolate_cake.jpg", price: 25 },
-  { name: "Cheesecake", imageUrl: "/cheesecake.jpg", price: 30 },
+  { name: "Cheesecake", imageUrl: "/cheesecake.jpg", price: 30 }
 ];
-async function main() {
-  console.log("Seeding database...");
 
-  // 🧹 Clear existing data first
+const drinks = [
+  { name: "Coke", imageUrl: "/coke.jpg", price: 15 },
+  { name: "Energy Drink", imageUrl: "/energy_drink.jpg", price: 20 },
+  { name: "Fanta", imageUrl: "/fanta.jpg", price: 15 },
+  { name: "Prime", imageUrl: "/energy_prime.jpeg", price: 25 },
+  { name: "Pepsi", imageUrl: "/pepsi.jpg", price: 15 },
+  { name: "Sprite", imageUrl: "/sprite.jpg", price: 15 },
+  { name: "Water", imageUrl: "/water.jpg", price: 10 }
+]
+
+async function main() {
+  console.log("Clearing database...");
+
+  await prisma.orderItem.deleteMany();
+  await prisma.cartItem.deleteMany();
   await prisma.order.deleteMany();
   await prisma.package.deleteMany();
   await prisma.food.deleteMany();
+  await prisma.drink.deleteMany();
+  await prisma.others.deleteMany();
+  await prisma.user.deleteMany();
 
+  console.log("Database cleared ✅");
+
+  // --- Seed Users ---
+  for (const u of users) {
+    await prisma.user.create({ data: u });
+  }
+
+  const dbUsers = await prisma.user.findMany();
+
+  // --- Seed Foods with Packages ---
   for (const food of foods) {
     await prisma.food.create({
       data: {
         name: food.name,
         imageUrl: food.imageUrl,
-        packages: {
-          create: food.packages.map((pkg) => ({
-            size: pkg.name,
-            price: pkg.price,
-          })),
-        },
+        packages: { create: food.packages.map(p => ({ name: p.name, price: p.price })) },
       },
     });
   }
 
-  console.log("Seeding completed ✅");
+  const dbFoods = await prisma.food.findMany();
+
+  // --- Seed Others ---
+ // --- Seed Others ---
+for (const other of others) {
+  await prisma.others.create({
+    data: {
+      name: other.name,
+      imageUrl: other.imageUrl,
+      price: other.price ?? 0, // fallback if undefined
+    },
+  });
 }
 
 
+
+// --- Seed Drinks ---
+const dbOthers = await prisma.others.findMany();
+
+// --- Seed Drinks ---
+for (const drink of drinks) {
+  await prisma.drink.create({ data: drink });
+}
+
+const dbDrinks = await prisma.drink.findMany();
+
+// --- Seed Orders per User ---
+for (const user of dbUsers) {
+  const order = await prisma.order.create({ data: { userId: user.id, total: 0 } });
+
+  // Add first Food (use first package price)
+  if (dbFoods.length) {
+    const firstFood = dbFoods[0];
+    const firstPackagePrice = firstFood.packages?.[0]?.price || 0; // fallback 0
+
+    await prisma.orderItem.create({
+      data: {
+        quantity: 1,
+        price: firstPackagePrice,
+        order: { connect: { id: order.id } },
+        food: { connect: { id: firstFood.id } },
+      },
+    });
+  }
+
+  // Add first Drink
+  if (dbDrinks.length) {
+    await prisma.orderItem.create({
+      data: {
+        quantity: 1,
+        price: dbDrinks[0].price,
+        order: { connect: { id: order.id } },
+        drink: { connect: { id: dbDrinks[0].id } },
+      },
+    });
+  }
+
+  // Add first Other
+  if (dbOthers.length) {
+    await prisma.orderItem.create({
+      data: {
+        quantity: 1,
+        price: dbOthers[0].price,
+        order: { connect: { id: order.id } },
+        others: { connect: { id: dbOthers[0].id } },
+      },
+    });
+  }
+}
+
+
+console.log("Seeding completed ✅");
+}
+
 main()
-    .catch((e) => {
-        console.error(e);
-        process.exit(1);
-    })
-    .finally(async () => {
-        await prisma.$disconnect();
-    }
-);
+  .catch(e => {
+    console.error(e);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });
