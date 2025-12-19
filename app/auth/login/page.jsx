@@ -6,46 +6,33 @@ import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const router = useRouter();
-
   const [isAdmin, setIsAdmin] = useState(false);
 
-  // USER login state
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  // ADMIN login state
   const [adminUser, setAdminUser] = useState("");
   const [adminPass, setAdminPass] = useState("");
 
-  const loginUser = async () => {
+  const login = async (email, password) => {
     const res = await fetch("/api/auth/login", {
       method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include", // 🔑 important
       body: JSON.stringify({ email, password }),
     });
 
     const data = await res.json();
 
-    if (data.user?.role === "ADMIN") {
-      router.push("/admin/dashboard");
-    } else if (data.user) {
-      router.push("/");
-    } else {
+    if (!res.ok) {
       alert(data.error || "Invalid credentials");
+      return;
     }
-  };
 
-  const loginAdmin = async () => {
-    const res = await fetch("/api/auth/login", {
-      method: "POST",
-      body: JSON.stringify({ email: adminUser, password: adminPass }),
-    });
-
-    const data = await res.json();
-
-    if (data.user?.role === "ADMIN") {
+    if (data.user.role === "ADMIN") {
       router.push("/admin/dashboard");
     } else {
-      alert("You are not an admin");
+      router.push("/");
     }
   };
 
@@ -56,7 +43,6 @@ export default function LoginPage() {
           {isAdmin ? "Admin Login" : "User Login"}
         </h1>
 
-        {/* USER LOGIN */}
         {!isAdmin && (
           <>
             <input
@@ -64,7 +50,7 @@ export default function LoginPage() {
               placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full p-3 border rounded-md focus:ring-2 focus:ring-blue-400"
+              className="w-full p-3 border rounded-md"
             />
 
             <input
@@ -72,36 +58,32 @@ export default function LoginPage() {
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full p-3 border rounded-md focus:ring-2 focus:ring-blue-400"
+              className="w-full p-3 border rounded-md"
             />
 
             <button
-              onClick={loginUser}
-              className="w-full bg-orange-600 text-white py-3 rounded-md hover:bg-orange-700 cursor-grab"
+              onClick={() => login(email, password)}
+              className="w-full bg-orange-600 text-white py-3 rounded-md"
             >
               Login
             </button>
 
             <div className="flex justify-between text-sm">
-              <Link href="/auth/reset" className="text-blue-600 hover:underline">
-                Forgot Password?
-              </Link>
-              <Link href="/auth/signup" className="text-orange-600 hover:underline">
+              <Link href="/auth/signup" className="text-orange-600">
                 Create Account
               </Link>
             </div>
           </>
         )}
 
-        {/* ADMIN LOGIN */}
         {isAdmin && (
           <>
             <input
-              type="text"
-              placeholder="Admin Username"
+              type="email"
+              placeholder="Admin Email"
               value={adminUser}
               onChange={(e) => setAdminUser(e.target.value)}
-              className="w-full p-3 border rounded-md focus:ring-2 focus:ring-red-400"
+              className="w-full p-3 border rounded-md"
             />
 
             <input
@@ -109,19 +91,18 @@ export default function LoginPage() {
               placeholder="Admin Password"
               value={adminPass}
               onChange={(e) => setAdminPass(e.target.value)}
-              className="w-full p-3 border rounded-md focus:ring-2 focus:ring-red-400"
+              className="w-full p-3 border rounded-md"
             />
 
             <button
-              onClick={loginAdmin}
-              className="w-full bg-green-600 text-white py-3 rounded-md hover:bg-green-700 cursor-grab"
+              onClick={() => login(adminUser, adminPass)}
+              className="w-full bg-green-600 text-white py-3 rounded-md"
             >
               Enter Admin Dashboard
             </button>
           </>
         )}
 
-        {/* SWITCH MODE */}
         <button
           className="w-full bg-gray-200 py-2 rounded-md"
           onClick={() => setIsAdmin(!isAdmin)}

@@ -1,6 +1,15 @@
 const { PrismaClient } = require("@prisma/client");
+const bcrypt = require("bcryptjs");
+
 const prisma = new PrismaClient();
 
+// const prisma = require("../lib/prisma.js").default;
+
+
+//bcrypt is used to hash user passwords before storing them in the database.
+
+// This seed file populates the database with initial data for testing and development.
+// It clears existing data and adds users, foods with packages, drinks, others, and sample orders.
 const foods = [
   {
     name: "Fried Rice and Chicken",
@@ -97,8 +106,8 @@ const foods = [
 ];
 
 const users = [
-  { name: "Alice Johnson", email: "alicej", password: "alicepassword", role: "USER" },
-  { name: "Bob Smith", email: "bobpassword", password: "bobpassword", role: "USER" },
+  { name: "Alice Johnson", email: "alice@gmail.com", password: "alicepassword", role: "USER" }, 
+{ name: "Bob Smith", email: "bob@gmail.com", password: "bobpassword", role: "USER" },
   { name: "Aiden Brown", email: "admin@youngnovate.com", password: "adminpassword", role: "ADMIN" },
 ];
 
@@ -109,14 +118,14 @@ const others = [
   { name: "Smoothies", imageUrl: "/smoothies.jpg", price: 25 },
   { name: "Lemonade", imageUrl: "/lemonade.jpg", price: 15 },
   { name: "Meat Pie", imageUrl: "/meat_pie.jpg", price: 12 },
-  { name: "Ice Cream", imageUrl: "/ice_cream.jpg", 
+  { name: "Ice Cream", imageUrl: "/ice_cream.jpg", price: 15,
     packages: [
       { name: "Chocolate Flavor", price: 15 ,imageUrl: "/ice_cream_chocolate.jpg"},
       { name: "Vanilla Flavor", price: 15, imageUrl: "/ice_cream_vanilla.jpg" },
       { name: "Strawberry Flavor", price: 15, imageUrl: "/ice_cream_strawberry.jpg" }
     ]
    },
-  { name: "Juices", imageUrl: "/juices.jpg",
+  { name: "Juices", imageUrl: "/juices.jpg", price: 15,
     packages: [
       { name: "Mango Juice", price: 15 },
       { name: "Pineapple Juice", price: 15 },
@@ -144,23 +153,36 @@ const drinks = [
 async function main() {
   console.log("Clearing database...");
 
-  await prisma.orderItem.deleteMany();
-  await prisma.cartItem.deleteMany();
-  await prisma.order.deleteMany();
-  await prisma.package.deleteMany();
-  await prisma.food.deleteMany();
-  await prisma.drink.deleteMany();
-  await prisma.others.deleteMany();
-  await prisma.user.deleteMany();
+  // Clear existing data
 
-  console.log("Database cleared ✅");
+  await prisma.orderItem.deleteMany();
+await prisma.cartItem.deleteMany();
+await prisma.order.deleteMany();
+
+await prisma.package.deleteMany(); // children
+await prisma.food.deleteMany();
+await prisma.others.deleteMany();
+await prisma.drink.deleteMany();
+
+await prisma.user.deleteMany();
+
+
+  
 
   // --- Seed Users ---
-  for (const u of users) {
-    await prisma.user.create({ data: u });
-  }
+for (const u of users) {
+  await prisma.user.create({
+    data: {
+      name: u.name,
+      email: u.email,
+      role: u.role,
+      password: await bcrypt.hash(u.password, 10),
+    },
+  });
+}
 
-  const dbUsers = await prisma.user.findMany();
+const dbUsers = await prisma.user.findMany();
+
 
   // --- Seed Foods with Packages ---
   for (const food of foods) {
@@ -173,40 +195,71 @@ async function main() {
     });
   }
 
-  const dbFoods = await prisma.food.findMany();
+ const dbFoods = await prisma.food.findMany({
+  include: { packages: true },
+});
 
-  // --- Seed Others ---
- // --- Seed Others ---
+
+// --- Seed Others ---
 for (const other of others) {
-  await prisma.others.create({
+  // Create the parent Others entry
+  const dbOther = await prisma.others.create({
     data: {
       name: other.name,
       imageUrl: other.imageUrl,
-      price: other.price ?? 0, // fallback if undefined
+      price: other.price ?? null,
     },
   });
+
+  // If this item has packages, create them individually
+  if (other.packages?.length) {
+    for (const pkg of other.packages) {
+      await prisma.package.create({
+        data: {
+          name: pkg.name,
+          price: pkg.price,
+          imageUrl: pkg.imageUrl ?? null,
+          othersId: dbOther.id, // explicitly connect to Others
+          foodId: null,
+          drinkId: null,
+        },
+      });
+    }
+  }
 }
 
 
 
-// --- Seed Drinks ---
+
+
+
+
+// --- Fetch seeded Others ---
 const dbOthers = await prisma.others.findMany();
 
 // --- Seed Drinks ---
 for (const drink of drinks) {
-  await prisma.drink.create({ data: drink });
+  await prisma.drink.create({
+    data: {
+      name: drink.name,
+      imageUrl: drink.imageUrl,
+      price: drink.price,
+    },
+  });
 }
-
+// --- Fetch seeded Drinks ---
 const dbDrinks = await prisma.drink.findMany();
 
 // --- Seed Orders per User ---
 for (const user of dbUsers) {
-  const order = await prisma.order.create({ data: { userId: user.id, total: 0 } });
+  const order = await prisma.order.create({
+    data: { userId: user.id, total: 0 },
+  });
 
-  // Add first Food (use first package price)
+  // Add first Food
   if (dbFoods.length) {
     const firstFood = dbFoods[0];
-    const firstPackagePrice = firstFood.packages?.[0]?.price || 0; // fallback 0
+    const firstPackagePrice = firstFood.packages?.[0]?.price || 0;
 
     await prisma.orderItem.create({
       data: {
@@ -242,6 +295,7 @@ for (const user of dbUsers) {
     });
   }
 }
+
 
 
 console.log("Seeding completed ✅");

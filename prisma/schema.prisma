@@ -1,12 +1,12 @@
 generator client {
   provider = "prisma-client-js"
 }
-
+// PostgreSQL database connection
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
-
+// User model representing application users
 model User {
   id        Int        @id @default(autoincrement())
   name      String?
@@ -19,7 +19,7 @@ model User {
   cartItems CartItem[]
   orders    Order[]
 }
-
+// Admin model for administrative users
 model Admin {
   id        Int      @id @default(autoincrement())
   email     String   @unique
@@ -28,7 +28,7 @@ model Admin {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
-
+// Category model for organizing items
 model Category {
   id     Int      @id @default(autoincrement())
   name   String
@@ -36,7 +36,7 @@ model Category {
   foods  Food[]
   others Others[]
 }
-
+// Food model representing food items
 model Food {
   id         Int         @id @default(autoincrement())
   name       String
@@ -49,7 +49,7 @@ model Food {
   orderItems OrderItem[]
   packages   Package[]
 }
-
+// Drink model representing drink items
 model Drink {
   id         Int         @id @default(autoincrement())
   name       String
@@ -60,8 +60,9 @@ model Drink {
   cartItems  CartItem[]
   category   Category?   @relation(fields: [categoryId], references: [id])
   orderItems OrderItem[]
+  packages   Package[]
 }
-
+// Order model representing customer orders
 model Order {
   id        Int         @id @default(autoincrement())
   createdAt DateTime    @default(now())
@@ -71,7 +72,7 @@ model Order {
   user      User?       @relation(fields: [userId], references: [id])
   items     OrderItem[]
 }
-
+// OrderItem model representing items within an order
 model OrderItem {
   id       Int    @id @default(autoincrement())
   orderId  Int
@@ -85,7 +86,7 @@ model OrderItem {
   others   Others? @relation(fields: [othersId], references: [id])
   order    Order  @relation(fields: [orderId], references: [id])
 }
-
+// CartItem model representing items in a user's cart
 model CartItem {
   id       Int      @id @default(autoincrement())
   userId   Int
@@ -103,7 +104,7 @@ model CartItem {
   @@unique([userId, drinkId])
   @@unique([userId, othersId])
 }
-
+// PasswordReset model for handling password reset tokens
 model PasswordReset {
   id        Int      @id @default(autoincrement())
   email     String
@@ -111,17 +112,22 @@ model PasswordReset {
   expiresAt DateTime
   createdAt DateTime @default(now())
 }
-
+// Package model representing food packages
 model Package {
   id          Int      @id @default(autoincrement())
   price       Float
-  foodId      Int
+  foodId      Int?
+  othersId     Int?
+  imageUrl    String?
   createdAt   DateTime @default(now())
   description String?
   name        String
-  food        Food     @relation(fields: [foodId], references: [id])
+  food        Food?     @relation(fields: [foodId], references: [id])
+  others      Others?   @relation(fields: [othersId], references: [id])
+  drinkId     Int?
+  drink       Drink?    @relation(fields: [drinkId], references: [id])
 }
-
+// Others model containing additional items like sides or desserts
 model Others {
   id         Int      @id @default(autoincrement())
   name       String
@@ -133,4 +139,6 @@ model Others {
   category Category? @relation(fields: [categoryId], references: [id])
   cartItems  CartItem[]
   orderItems OrderItem[]
+  packages   Package[]
+  
 }

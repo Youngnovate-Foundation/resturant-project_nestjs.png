@@ -1,5 +1,5 @@
 "use client";
-
+// Modal component for displaying food details and adding to cart
 import React, { useState } from "react";
 import {
   Dialog,
@@ -7,9 +7,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+//Using Shadcn UI Dialog components
 import Image from "next/image";
+// Using Next.js Image component for optimized images
+// React Query for mutations
 import { useMutation } from "@tanstack/react-query";
-
+// Modal component
 const Modal = ({ open, setOpen, food, userId }) => {
   const [order, setOrder] = useState({
     userId,

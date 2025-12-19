@@ -1,4 +1,5 @@
-import prisma from "@prisma/client";
+const prisma = require("@/lib/prisma");
+
 import { NextResponse } from "next/server";
 
 export async function GET() {

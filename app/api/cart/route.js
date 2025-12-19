@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import prisma from "@prisma/client";  // your prisma instance
+const prisma = require("@/lib/prisma");
+ // your prisma instance
 
 export async function GET(req) {
   try {

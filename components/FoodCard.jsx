@@ -1,8 +1,12 @@
 "use client";
 import React from "react";
 import Image from "next/image";
+// Using Next.js Image component for optimized images
 import { ShoppingCart } from "lucide-react";
+// Shopping cart icon from lucide-react
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+// React Query for mutations and query management
+// FoodCard component displaying food details and add to cart functionality
 
 const FoodCard = ({ food, onClick, userId }) => {
   const queryClient = useQueryClient();
@@ -41,6 +45,7 @@ const FoodCard = ({ food, onClick, userId }) => {
       onClick={onClick}
       className="bg-white w-72 flex flex-col justify-center items-center shadow-md rounded-lg gap-4 h-72 cursor-pointer hover:shadow-xl transition"
     >
+      <div className="flex flex-col items-center  gap-2">
       <Image
         src={food.imageUrl}
         alt={food.name}
@@ -52,7 +57,7 @@ const FoodCard = ({ food, onClick, userId }) => {
       <h2 className="font-bold text-center">{food.name}</h2>
 
       <h4 className="text-amber-500 font-semibold">₵{previewPrice}</h4>
-
+      </div>
       {/* Add to Cart Button */}
       <button
         onClick={(e) => {

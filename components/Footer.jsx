@@ -1,5 +1,5 @@
 import React from "react";
-
+// Footer component with gradient background and developer credit
 const Footer = () => {
     return (
       <footer className="bg-gradient-to-r from-orange-500 to-orange-700 text-white text-center font-semibold py-6 mt-auto shadow-lg rounded-t-lg">
