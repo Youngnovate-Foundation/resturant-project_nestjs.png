@@ -100,9 +100,7 @@ model CartItem {
   user     User     @relation(fields: [userId], references: [id])
   others   Others?  @relation(fields: [othersId], references: [id])
 
-  @@unique([userId, foodId])
-  @@unique([userId, drinkId])
-  @@unique([userId, othersId])
+  @@unique([userId, foodId, drinkId, othersId])
 }
 // PasswordReset model for handling password reset tokens
 model PasswordReset {

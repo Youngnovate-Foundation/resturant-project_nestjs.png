@@ -1,142 +1,58 @@
-"use client";
+import Link from "next/link";
 
-import FoodCard from "@/components/FoodCard";
-import SimpleItemCard from "@/components/SimpleItemCard";
-import Modal from "@/components/Modal";
-import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
-
-export default function Page({ userId }) {
-  const [selectedItem, setSelectedItem] = useState(null);
-  const [open, setOpen] = useState(false);
-
-  // Fetch foods
-  const { data: foods, isLoading: foodsLoading, isError: foodsError, error: foodsErr } = useQuery({
-    queryKey: ["foods"],
-    queryFn: async () => {
-      const res = await fetch("/api/food/");
-      return res.json();
-    },
-  });
-
-  // Fetch drinks
-  const { data: drinks, isLoading: drinksLoading, isError: drinksError, error: drinksErr } = useQuery({
-    queryKey: ["drinks"],
-    queryFn: async () => {
-      const res = await fetch("/api/drink/");
-      return res.json();
-    },
-  });
-
-  // Fetch others
-  const { data: others, isLoading: othersLoading, isError: othersError, error: othersErr } = useQuery({
-    queryKey: ["others"],
-    queryFn: async () => {
-      const res = await fetch("/api/others/");
-      return res.json();
-    },
-  });
-
-  if (foodsLoading || drinksLoading || othersLoading) {
-    return (
-      <div className="w-full flex justify-center py-10">
-        <div className="p-4 rounded-xl shadow-md bg-white flex items-center space-x-3">
-          <div className="animate-spin rounded-full h-6 w-6 border-4 border-gray-300 border-t-blue-500"></div>
-          <span className="font-medium text-gray-700">Loading...</span>
-        </div>
-      </div>
-    );
-  }
-
-  if (foodsError || drinksError || othersError) {
-    return (
-      <div className="text-red-600">
-        Error: {foodsErr?.message || drinksErr?.message || othersErr?.message}
-      </div>
-    );
-  }
-
-  const handleOpenModal = (item) => {
-    setSelectedItem(item);
-    setOpen(true);
-  };
-
+export default function LandingPage() {
   return (
-    <div className="p-8 bg-gray-100 space-y-8">
-      {/* Welcome Section with Resturant Introduction */}
-      <section className="text-center mb-12">
-        <h1 className="text-4xl font-extrabold text-gray-800 mb-4 py-10">
-          Welcome to <span className="text-emerald-600">Ceccy Ann Resturant</span> Resturant
+    <div className="min-h-screen bg-gray-100 flex flex-col">
+      
+      {/* Hero */}
+      <section className="flex-1 flex flex-col items-center justify-center text-center pt-20">
+        <h1 className="text-5xl font-extrabold text-gray-800 mb-4 py-10">
+          Ceccy Ann Restaurant
         </h1>
-        <p className="text-gray-600 max-w-2xl mx-auto">
-          Discover a variety of delicious foods, refreshing drinks, and other delightful treats. Browse our menu and add your favorite items to the cart!
+        <p className="max-w-2xl text-gray-600 text-lg mb-8">
+          We serve freshly prepared meals, refreshing drinks, and delightful treats.
+          Order with ease, track your meals, and enjoy quality service.
         </p>
+
+        <div className="flex gap-4">
+          <Link
+            href="/auth/login"
+            className="px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
+          >
+            Login
+          </Link>
+
+          <Link
+            href="/auth/signup"
+            className="px-6 py-3 border border-emerald-600 text-emerald-600 rounded-lg hover:bg-emerald-50"
+          >
+            Sign Up
+          </Link>
+        </div>
       </section>
 
-  {/* FOODS */}
-  <section id="Foods">
-    <h2 className="text-2xl font-bold text-center mb-6 text-gray-800 border-b-2 border-emerald-500 w-max mx-auto pb-2 py-10">
-      Foods
-    </h2>
-    <div className="flex flex-wrap justify-center gap-6">
-      {foods?.map(food => (
-        <div className="w-[30%] min-w-[200px]">
-          <FoodCard
-            key={food.id}
-            food={food}
-            userId={userId}
-            onClick={() => handleOpenModal(food)}
-          />
+      {/* Services */}
+      <section className="bg-white py-16">
+        <div className="max-w-5xl mx-auto px-6 grid md:grid-cols-3 gap-8">
+          <Service title="Quality Meals" desc="Freshly prepared dishes daily." />
+          <Service title="Fast Ordering" desc="Order from anywhere with ease." />
+          <Service title="Reliable Service" desc="Your satisfaction is our priority." />
         </div>
-      ))}
+      </section>
+
+      {/* Footer */}
+      <footer className="text-center py-6 text-gray-500 text-sm">
+        © {new Date().getFullYear()} Ceccy Ann Restaurant
+      </footer>
     </div>
-  </section>
+  );
+}
 
-  {/* DRINKS */}
- <section id="Drinks">
-    <h2 className="text-2xl font-bold text-center mb-6 text-gray-800 border-b-2 border-emerald-500 w-max mx-auto pb-2" >
-      Drinks
-    </h2>
-    <div className="flex flex-wrap justify-center gap-6">
-      {drinks?.map(drink => (
-        <div className="w-[30%] min-w-[200px]">
-          <SimpleItemCard
-            key={drink.id}
-            item={drink}
-            type="drink"
-            userId={userId}
-            onClick={() => handleOpenModal(drink)}
-          />
-        </div>
-      ))}
+function Service({ title, desc }) {
+  return (
+    <div className="p-6 rounded-xl shadow-sm bg-gray-50 text-center">
+      <h3 className="font-semibold text-lg mb-2">{title}</h3>
+      <p className="text-gray-600">{desc}</p>
     </div>
-  </section>
-
-  {/* OTHERS */}
-  <section id="Others">
-    <h2 className="text-2xl font-bold text-center mb-6 text-gray-800 border-b-2 border-emerald-500 w-max mx-auto pb-2" >
-      Others
-    </h2>
-    <div className="flex flex-wrap justify-center gap-6">
-      {others?.map(other => (
-        <div className="w-[30%] min-w-[200px]">
-          <SimpleItemCard
-            key={other.id}
-            item={other}
-            type="others"
-            userId={userId}
-            onClick={() => handleOpenModal(other)}
-          />
-        </div>
-      ))}
-    </div>
-  </section>
-
-  {/* Modal */}
-  {selectedItem && open && (
-    <Modal food={selectedItem} open={open} setOpen={setOpen} />
-  )}
-
-</div>
   );
 }

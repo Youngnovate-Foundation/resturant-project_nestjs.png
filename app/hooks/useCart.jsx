@@ -1,5 +1,4 @@
 "use client";
-
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 export function useCart(userId) {
@@ -9,8 +8,8 @@ export function useCart(userId) {
   const { data, isLoading } = useQuery({
     queryKey: ["cart", userId],
     queryFn: async () => {
-      const res = await fetch("app/api/cart", {
-        headers: { userId }
+      const res = await fetch(`/api/cart/`, {
+        headers: { "userId": userId }
       });
       return res.json();
     },
@@ -19,8 +18,9 @@ export function useCart(userId) {
   // Add to cart
   const addToCart = useMutation({
     mutationFn: async (payload) => {
-      const res = await fetch("app/api/cart/add", {
+      const res = await fetch("/api/cart/add", {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
       return res.json();
@@ -31,8 +31,9 @@ export function useCart(userId) {
   // Update quantity
   const updateQuantity = useMutation({
     mutationFn: async ({ cartItemId, quantity }) => {
-      const res = await fetch("app/api/cart/update-quantity", {
+      const res = await fetch("/api/cart/update", {
         method: "PATCH",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ cartItemId, quantity }),
       });
       return res.json();
@@ -43,8 +44,9 @@ export function useCart(userId) {
   // Remove item
   const removeItem = useMutation({
     mutationFn: async (cartItemId) => {
-      await fetch("app/api/cart/remove", {
+      await fetch("/api/cart/remove", {
         method: "DELETE",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ cartItemId }),
       });
     },

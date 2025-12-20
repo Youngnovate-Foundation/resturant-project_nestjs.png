@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 const prisma = require("@/lib/prisma");
- // your prisma instance
 
 export async function GET(req) {
   try {
@@ -14,20 +13,21 @@ export async function GET(req) {
       where: { userId: Number(userId) },
       include: {
         food: true,
-        drink: true
+        drink: true,
+        others: true, // include others items
       },
-      orderBy: { addedAt: "desc" }
+      orderBy: { addedAt: "desc" },
     });
 
     // Calculate totals
     const items = cart.map((item) => {
-      const price = item.food?.price || item.drink?.price || 0;
+      const price = item.food?.price || item.drink?.price || item.others?.price || 0;
       const total = price * item.quantity;
 
       return {
         ...item,
         price,
-        total
+        total,
       };
     });
 
