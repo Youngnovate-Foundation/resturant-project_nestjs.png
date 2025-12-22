@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-const prisma = require("@/lib/prisma");
+const prisma = require("@/lib/prisma");  // ← fixed import
 
 export async function POST(req) {
   try {
@@ -7,7 +7,7 @@ export async function POST(req) {
 
     let price = 0;
 
-    // ✅ FOOD (has packages)
+    // FOOD
     if (foodId) {
       const food = await prisma.food.findUnique({
         where: { id: foodId },
@@ -15,54 +15,46 @@ export async function POST(req) {
       });
 
       if (!food) {
-        return NextResponse.json(
-          { error: "Food not found" },
-          { status: 404 }
-        );
+        return NextResponse.json({ error: "Food not found" }, { status: 404 });
       }
 
-      // ✅ take smallest package price
-      if (food.packages?.length) {
-        price = Math.min(...food.packages.map(p => p.price));
-      } else {
-        price = food.price;
-      }
+      // take smallest package price
+      price = food.packages?.length
+        ? Math.min(...food.packages.map(p => p.price))
+        : food.price;
     }
 
-    // ✅ DRINK (no packages)
+    // DRINK
     if (drinkId) {
       const drink = await prisma.drink.findUnique({
         where: { id: drinkId },
       });
+      if (!drink) return NextResponse.json({ error: "Drink not found" }, { status: 404 });
       price = drink.price;
     }
 
-    // ✅ OTHERS (no packages)
+    // OTHERS
     if (othersId) {
       const others = await prisma.others.findUnique({
         where: { id: othersId },
       });
+      if (!others) return NextResponse.json({ error: "Item not found" }, { status: 404 });
       price = others.price;
     }
 
     const cartItem = await prisma.cartItem.create({
       data: {
         userId,
-        foodId,
-        drinkId,
-        othersId,
+        foodId: foodId || null,
+        drinkId: drinkId || null,
+        othersId: othersId || null,
         quantity,
-        price,
       },
     });
 
     return NextResponse.json(cartItem);
-
   } catch (err) {
     console.error("ADD TO CART ERROR:", err);
-    return NextResponse.json(
-      { error: "Failed to add to cart" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to add to cart" }, { status: 500 });
   }
 }
