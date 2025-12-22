@@ -43,14 +43,18 @@ export default function Cart() {
       {cart.map((item) => {
         // Determine the display price
         let price = 0;
-        if (item.food) {
-          // Use smallest package price
-          price = item.food.packages?.[0]?.price || 0;
-        } else if (item.drink) {
-          price = item.price || item.drink.price;
-        } else if (item.others) {
-          price = item.price || item.others.price;
-        }
+
+if (item.food) {
+  // Take the smallest package price dynamically
+  price = item.food.packages?.length
+    ? Math.min(...item.food.packages.map((p) => p.price))
+    : item.food.price || 0;
+} else if (item.drink) {
+  price = item.drink.price || 0;
+} else if (item.others) {
+  price = item.others.price || 0;
+}
+
 
         return (
           <div key={item.id} className="flex items-center justify-between border-b py-3">

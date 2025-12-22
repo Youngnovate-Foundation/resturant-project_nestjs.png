@@ -12,7 +12,9 @@ export async function GET(req) {
     const cart = await prisma.cartItem.findMany({
       where: { userId: Number(userId) },
       include: {
-        food: true,
+        food: {
+          include: { packages: true },
+        },
         drink: true,
         others: true, // include others items
       },
