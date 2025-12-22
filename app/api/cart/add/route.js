@@ -1,40 +1,68 @@
 import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+const prisma = require("@/lib/prisma");
 
 export async function POST(req) {
   try {
-    const body = await req.json();
-    const { userId, foodId, drinkId, othersId, quantity } = body;
+    const { userId, foodId, drinkId, othersId, quantity } = await req.json();
 
-    if (!userId) return NextResponse.json({ error: "User not authenticated" }, { status: 401 });
-    if (!foodId && !drinkId && !othersId) return NextResponse.json({ error: "Item id required" }, { status: 400 });
+    let price = 0;
 
-    // Check existing
-    const existingItem = await prisma.cartItem.findFirst({
-      where: {
-        userId,
-        foodId: foodId || undefined,
-        drinkId: drinkId || undefined,
-        othersId: othersId || undefined
-      }
-    });
-
-    if (existingItem) {
-      const updated = await prisma.cartItem.update({
-        where: { id: existingItem.id },
-        data: { quantity: existingItem.quantity + quantity }
+    // ✅ FOOD (has packages)
+    if (foodId) {
+      const food = await prisma.food.findUnique({
+        where: { id: foodId },
+        include: { packages: true },
       });
-      return NextResponse.json(updated);
+
+      if (!food) {
+        return NextResponse.json(
+          { error: "Food not found" },
+          { status: 404 }
+        );
+      }
+
+      // ✅ take smallest package price
+      if (food.packages?.length) {
+        price = Math.min(...food.packages.map(p => p.price));
+      } else {
+        price = food.price;
+      }
     }
 
-    const newItem = await prisma.cartItem.create({
-      data: { userId, foodId, drinkId, othersId, quantity }
+    // ✅ DRINK (no packages)
+    if (drinkId) {
+      const drink = await prisma.drink.findUnique({
+        where: { id: drinkId },
+      });
+      price = drink.price;
+    }
+
+    // ✅ OTHERS (no packages)
+    if (othersId) {
+      const others = await prisma.others.findUnique({
+        where: { id: othersId },
+      });
+      price = others.price;
+    }
+
+    const cartItem = await prisma.cartItem.create({
+      data: {
+        userId,
+        foodId,
+        drinkId,
+        othersId,
+        quantity,
+        price,
+      },
     });
 
-    return NextResponse.json(newItem);
+    return NextResponse.json(cartItem);
 
   } catch (err) {
-    console.error(err);
-    return NextResponse.json({ error: "Failed to add to cart" }, { status: 500 });
+    console.error("ADD TO CART ERROR:", err);
+    return NextResponse.json(
+      { error: "Failed to add to cart" },
+      { status: 500 }
+    );
   }
 }

@@ -1,21 +1,15 @@
 "use client";
-// Modal component for displaying food details and adding to cart
-import React, { useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-//Using Shadcn UI Dialog components
+import React, { useState, useEffect } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import Image from "next/image";
-// Using Next.js Image component for optimized images
-// React Query for mutations
 import { useMutation } from "@tanstack/react-query";
-// Modal component
-const Modal = ({ open, setOpen, food, userId }) => {
+import { useUser } from "../context/UserContext"; // ✅ import context
+
+const Modal = ({ open, setOpen, food }) => {
+  const { currentUser } = useUser(); // ✅ get logged-in user
+
   const [order, setOrder] = useState({
-    userId,
+    userId: null,
     foodId: food.id,
     packageId: null,
     location: "",
@@ -23,20 +17,21 @@ const Modal = ({ open, setOpen, food, userId }) => {
     quantity: 1,
   });
 
-  // update selected package
-  const updatePackage = (id) => {
-    setOrder((prev) => ({ ...prev, packageId: id }));
-  };
+  // ✅ set userId once currentUser is available
+  useEffect(() => {
+    if (currentUser) {
+      setOrder((prev) => ({ ...prev, userId: currentUser.id }));
+    }
+  }, [currentUser]);
 
-  const updateLocation = (val) =>
-    setOrder((prev) => ({ ...prev, location: val }));
+  const updatePackage = (id) => setOrder((prev) => ({ ...prev, packageId: id }));
+  const updateLocation = (val) => setOrder((prev) => ({ ...prev, location: val }));
+  const updateNotes = (val) => setOrder((prev) => ({ ...prev, notes: val }));
 
-  const updateNotes = (val) =>
-    setOrder((prev) => ({ ...prev, notes: val }));
-
-  // Mutation → Add to cart
   const addToCart = useMutation({
     mutationFn: async () => {
+      if (!currentUser) throw new Error("Please login to add items to your cart");
+
       const res = await fetch("/api/cart", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -72,16 +67,13 @@ const Modal = ({ open, setOpen, food, userId }) => {
             {/* PACKAGE SELECT */}
             <div className="my-4">
               <h2 className="font-bold text-xl">CHOOSE PACKAGE</h2>
-
               <div className="grid grid-cols-2 gap-2 bg-gray-200 p-2 mb-1">
                 {food.packages.map((pkg) => (
                   <div
                     key={pkg.id}
                     onClick={() => updatePackage(pkg.id)}
                     className={`border p-4 rounded-lg cursor-pointer bg-white transition ${
-                      order.packageId === pkg.id
-                        ? "border-amber-400 bg-amber-50"
-                        : "border-gray-200"
+                      order.packageId === pkg.id ? "border-amber-400 bg-amber-50" : "border-gray-200"
                     }`}
                   >
                     <h3 className="font-semibold">{pkg.name}</h3>
@@ -115,7 +107,7 @@ const Modal = ({ open, setOpen, food, userId }) => {
             {/* SUBMIT BUTTON */}
             <button
               onClick={() => addToCart.mutate()}
-              disabled={addToCart.isPending}
+              disabled={addToCart.isPending || !currentUser} // ✅ disable if not logged in
               className="bg-amber-500 hover:bg-amber-600 transition-colors duration-300 mx-auto px-4 py-2 rounded-md font-semibold text-white shadow-md cursor-pointer"
             >
               {addToCart.isPending ? "Adding..." : "Add to Cart"}

@@ -13,17 +13,47 @@ export function useCart(userId) {
       });
       return res.json();
     },
+    enabled: !!userId, // Only fetch if userId exists
   });
 
   // Add to cart
   const addToCart = useMutation({
     mutationFn: async (payload) => {
-      const res = await fetch("/api/cart/add", {
+      // For food, auto-select the smallest package
+      if (payload.foodId) {
+        const res = await fetch(`/api/food/${payload.foodId}`);
+        const food = await res.json();
+
+        if (food.packages && food.packages.length) {
+          const smallPackage = food.packages.reduce((prev, curr) =>
+            curr.price < prev.price ? curr : prev
+          );
+          payload.packageId = smallPackage.id;
+          payload.price = smallPackage.price;
+        }
+      }
+
+      // Drinks and Others price
+      if (payload.drinkId && !payload.price) {
+        const res = await fetch(`/api/drink/${payload.drinkId}`);
+        const drink = await res.json();
+        payload.price = drink.price;
+      }
+
+      if (payload.othersId && !payload.price) {
+        const res = await fetch(`/api/others/${payload.othersId}`);
+        const other = await res.json();
+        payload.price = other.price;
+      }
+
+      const res2 = await fetch("/api/cart/add", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      return res.json();
+
+      if (!res2.ok) throw new Error("Failed to add to cart");
+      return res2.json();
     },
     onSuccess: () => queryClient.invalidateQueries(["cart", userId]),
   });
@@ -53,9 +83,19 @@ export function useCart(userId) {
     onSuccess: () => queryClient.invalidateQueries(["cart", userId]),
   });
 
+  // Compute cart total
+  const cartTotal = data?.items?.reduce((sum, item) => {
+    let price = item.price;
+    if (item.food && item.packageId) {
+      const pkg = item.food.packages.find(p => p.id === item.packageId);
+      if (pkg) price = pkg.price;
+    }
+    return sum + price * item.quantity;
+  }, 0) || 0;
+
   return {
     cart: data?.items || [],
-    cartTotal: data?.cartTotal || 0,
+    cartTotal,
     isLoading,
     addToCart,
     updateQuantity,

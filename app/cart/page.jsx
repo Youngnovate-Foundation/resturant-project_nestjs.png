@@ -4,8 +4,9 @@ import React from "react";
 import { useCart } from "@/hooks/useCart";
 
 export default function CartPage() {
-  const userId = 1; // replace with real auth userId
-  const { cart, cartTotal, isLoading, updateQuantity, removeItem } = useCart(userId);
+  const userId = 1; // replace later with real auth userId
+  const { cart, cartTotal, isLoading, updateQuantity, removeItem } =
+    useCart(userId);
 
   if (isLoading) {
     return (
@@ -25,9 +26,19 @@ export default function CartPage() {
 
       <div className="space-y-4">
         {cart.map((item) => {
-          const title = item.food?.name || item.drink?.name;
-          const price = item.price;
-          const total = item.total;
+          const isFood = !!item.food;
+
+          // ✅ PRICE FIX
+          const price = isFood
+            ? item.food?.packages?.[0]?.price ?? 0 // Small package
+            : item.price;
+
+          const total = price * item.quantity;
+
+          const title =
+            item.food?.name ||
+            item.drink?.name ||
+            item.others?.name;
 
           return (
             <div
@@ -36,12 +47,18 @@ export default function CartPage() {
             >
               <div>
                 <h2 className="text-lg font-semibold">{title}</h2>
-                <p className="text-gray-500">${price} x {item.quantity}</p>
-                <p className="font-semibold mt-1">= ${total}</p>
+
+                <p className="text-gray-500">
+                  ₵{price} × {item.quantity}
+                </p>
+
+                <p className="font-semibold mt-1">
+                  = ₵{total}
+                </p>
               </div>
 
               <div className="flex items-center gap-3">
-                {/* Quantity Controls */}
+                {/* Decrease */}
                 <button
                   onClick={() =>
                     updateQuantity.mutate({
@@ -50,13 +67,14 @@ export default function CartPage() {
                     })
                   }
                   disabled={item.quantity === 1}
-                  className="px-3 py-1 bg-gray-200 rounded"
+                  className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
                 >
                   -
                 </button>
 
                 <span>{item.quantity}</span>
 
+                {/* Increase */}
                 <button
                   onClick={() =>
                     updateQuantity.mutate({
@@ -84,7 +102,9 @@ export default function CartPage() {
 
       {/* CART TOTAL */}
       <div className="mt-6 p-4 bg-emerald-600 text-white rounded-xl">
-        <h2 className="text-xl font-semibold">Total: ${cartTotal}</h2>
+        <h2 className="text-xl font-semibold">
+          Total: ₵{cartTotal}
+        </h2>
       </div>
     </div>
   );

@@ -3,9 +3,11 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useUser } from "@/context/UserContext"; // ✅ import UserContext
 
 export default function SignupPage() {
   const router = useRouter();
+  const { setCurrentUser } = useUser(); // ✅ setter for global user
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -31,36 +33,50 @@ export default function SignupPage() {
 
     setLoading(true);
 
-    // Signup request
-    const res = await fetch("/api/auth/signup", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, password }),
-    });
+    try {
+      // 1️⃣ Signup request
+      const res = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password }),
+      });
 
-    const data = await res.json();
+      const data = await res.json();
 
-    if (!res.ok) {
-      setError(data.error || "Something went wrong");
+      if (!res.ok) {
+        setError(data.error || "Something went wrong");
+        setLoading(false);
+        return;
+      }
+
+      // 2️⃣ Auto-login after signup
+      const loginRes = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ email, password }),
+      });
+
+      const loginData = await loginRes.json();
+
+      if (loginRes.ok) {
+        // ✅ Set the logged-in user globally
+        setCurrentUser({
+          id: loginData.user.id,
+          name: loginData.user.name,
+          email: loginData.user.email,
+        });
+
+        router.push("/shop"); // navigate to shop
+      } else {
+        router.push("/auth/login"); // fallback
+      }
+    } catch (err) {
+      console.error(err);
+      setError("Signup failed. Please try again.");
+    } finally {
       setLoading(false);
-      return;
     }
-
-    // Auto-login after signup
-    const loginRes = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ email, password }),
-    });
-
-    if (loginRes.ok) {
-      router.push("/shop");
-    } else {
-      router.push("/auth/login");
-    }
-
-    setLoading(false);
   };
 
   return (
@@ -80,9 +96,7 @@ export default function SignupPage() {
         <div className="bg-white shadow-xl rounded-xl p-8 w-full max-w-md space-y-6">
           <h1 className="text-2xl font-bold text-center">Create Account</h1>
 
-          {error && (
-            <p className="text-sm text-red-500 text-center">{error}</p>
-          )}
+          {error && <p className="text-sm text-red-500 text-center">{error}</p>}
 
           <input
             type="text"

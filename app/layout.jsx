@@ -14,13 +14,15 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className="antialiased text-lg bg-gray-100 min-h-screen flex flex-col">
+        <Provider>
         <UserProvider>  {/* ✅ Wrap the app in UserProvider */}
-          <Provider>
+          
             <Navbar />
             <main className="flex-1">{children}</main>
             <Footer />
-          </Provider>
+          
         </UserProvider>
+        </Provider>
       </body>
     </html>
   );

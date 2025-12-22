@@ -39,7 +39,13 @@ export default function LoginPage() {
         body: JSON.stringify({ email, password }),
       });
 
-      const data = await res.json();
+      let data = {};
+      try {
+        data = await res.json();
+      } catch {
+        data = {};
+      }
+
 
       if (!res.ok) {
         setError(data.error || "Invalid credentials");
