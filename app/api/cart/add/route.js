@@ -49,6 +49,7 @@ export async function POST(req) {
         drinkId: drinkId || null,
         othersId: othersId || null,
         quantity,
+        price,
       },
     });
 
