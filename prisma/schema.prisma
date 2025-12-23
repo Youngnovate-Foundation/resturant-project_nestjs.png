@@ -94,6 +94,7 @@ model CartItem {
   drinkId  Int?
   othersId  Int?
   quantity Int      @default(1)
+  price    Float
   addedAt  DateTime @default(now())
   drink    Drink?   @relation(fields: [drinkId], references: [id])
   food     Food?    @relation(fields: [foodId], references: [id])

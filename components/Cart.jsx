@@ -44,20 +44,22 @@ export default function Cart() {
         // Determine the display price
         let price = 0;
 
-if (item.food) {
-  // Take the smallest package price dynamically
-  price = item.food.packages?.length
-    ? Math.min(...item.food.packages.map((p) => p.price))
-    : item.food.price || 0;
-} else if (item.drink) {
-  price = item.drink.price || 0;
-} else if (item.others) {
-  price = item.others.price || 0;
-}
-
+        if (item.food) {
+          // Take the smallest package price dynamically
+          price = item.food.packages?.length
+            ? Math.min(...item.food.packages.map((p) => p.price))
+            : item.food.price || 0;
+        } else if (item.drink) {
+          price = item.drink.price || 0;
+        } else if (item.others) {
+          price = item.others.price || 0;
+        }
 
         return (
-          <div key={item.id} className="flex items-center justify-between border-b py-3">
+          <div
+            key={item.id}
+            className="flex items-center justify-between border-b py-3"
+          >
             <div className="flex items-center gap-4">
               <img
                 src={
@@ -65,18 +67,16 @@ if (item.food) {
                   item.drink?.imageUrl ||
                   item.others?.imageUrl
                 }
-                alt={
-                  item.food?.name ||
-                  item.drink?.name ||
-                  item.others?.name
-                }
+                alt={item.food?.name || item.drink?.name || item.others?.name}
                 className="w-16 h-16 rounded-full object-cover"
               />
               <div>
                 <h3 className="font-semibold">
                   {item.food?.name || item.drink?.name || item.others?.name}
                 </h3>
-                <p className="text-amber-500 font-semibold">₵{price || item.food?.packages?.[0]?.price}</p>
+                <p className="text-amber-500 font-semibold">
+                  ₵{price || item.food?.packages?.[0]?.price}
+                </p>
               </div>
             </div>
 
@@ -123,7 +123,26 @@ if (item.food) {
       </div>
 
       {/* Checkout Button */}
-      <button className="w-full mt-4 py-3 bg-emerald-600 text-white font-semibold rounded-lg hover:bg-emerald-700 transition">
+      <button
+        onClick={async () => {
+          const res = await fetch("/api/checkout", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ userId }),
+          });
+
+          const data = await res.json();
+
+          if (!res.ok) {
+            alert(data.error);
+            return;
+          }
+
+          // Redirect later to payment or order page
+          alert("Order placed successfully");
+        }}
+        className="w-full mt-4 py-3 bg-emerald-600 text-white font-semibold rounded-lg"
+      >
         Proceed to Checkout
       </button>
     </div>
