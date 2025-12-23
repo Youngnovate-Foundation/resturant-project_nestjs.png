@@ -20,14 +20,11 @@ export async function POST(req) {
     });
 
     if (!cartItems.length) {
-      return NextResponse.json(
-        { error: "Cart is empty" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Cart is empty" }, { status: 400 });
     }
 
     // 2️⃣ Calculate total
-    const totalAmount = cartItems.reduce(
+    const total = cartItems.reduce(
       (sum, item) => sum + item.price * item.quantity,
       0
     );
@@ -35,32 +32,28 @@ export async function POST(req) {
     // 3️⃣ Create order
     const order = await prisma.order.create({
       data: {
-        userId,
-        totalAmount,
-        status: "PENDING",
+        total,
+        status: "pending",
+        user: { connect: { id: userId } }, // ✅ connect user properly
         items: {
           create: cartItems.map((item) => ({
-            foodId: item.foodId,
-            drinkId: item.drinkId,
-            othersId: item.othersId,
+            foodId: item.foodId || null,
+            drinkId: item.drinkId || null,
+            othersId: item.othersId || null,
             quantity: item.quantity,
             price: item.price,
           })),
         },
       },
+      include: { items: true },
     });
 
     // 4️⃣ Clear cart
-    await prisma.cartItem.deleteMany({
-      where: { userId },
-    });
+    await prisma.cartItem.deleteMany({ where: { userId } });
 
     return NextResponse.json(order);
   } catch (err) {
     console.error("CHECKOUT ERROR:", err);
-    return NextResponse.json(
-      { error: "Checkout failed" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Checkout failed" }, { status: 500 });
   }
 }

@@ -68,7 +68,7 @@ model Order {
   createdAt DateTime    @default(now())
   status    String      @default("pending")
   total     Float
-  userId    Int?
+  userId    Int
   user      User?       @relation(fields: [userId], references: [id])
   items     OrderItem[]
 }
@@ -94,8 +94,9 @@ model CartItem {
   drinkId  Int?
   othersId  Int?
   quantity Int      @default(1)
-  price    Float
+  price    Float?
   addedAt  DateTime @default(now())
+  
   drink    Drink?   @relation(fields: [drinkId], references: [id])
   food     Food?    @relation(fields: [foodId], references: [id])
   user     User     @relation(fields: [userId], references: [id])

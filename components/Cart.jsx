@@ -138,10 +138,10 @@ export default function Cart() {
             return;
           }
 
-          // Redirect later to payment or order page
-          alert("Order placed successfully");
+          alert("Order placed successfully!");
+          window.location.reload();
         }}
-        className="w-full mt-4 py-3 bg-emerald-600 text-white font-semibold rounded-lg"
+        className="w-full mt-4 py-3 bg-emerald-600 text-white font-semibold rounded-lg hover:bg-emerald-700"
       >
         Proceed to Checkout
       </button>
