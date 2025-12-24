@@ -91,6 +91,9 @@ model CartItem {
   id       Int      @id @default(autoincrement())
   userId   Int
   foodId   Int?
+  packageId Int?
+  location String?
+  notes    String?
   drinkId  Int?
   othersId  Int?
   quantity Int      @default(1)
