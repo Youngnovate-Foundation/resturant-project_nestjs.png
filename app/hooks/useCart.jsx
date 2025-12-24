@@ -93,6 +93,15 @@ export function useCart(userId) {
     return sum + price * item.quantity;
   }, 0) || 0;
 
+
+  // in useCart.js
+const resetCart = () => {
+  queryClient.setQueryData(["cart", userId], {
+    items: [],
+  });
+};
+
+
   return {
     cart: data?.items || [],
     cartTotal,
@@ -100,5 +109,6 @@ export function useCart(userId) {
     addToCart,
     updateQuantity,
     removeItem,
+    resetCart,
   };
 }

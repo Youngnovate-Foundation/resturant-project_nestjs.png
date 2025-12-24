@@ -80,7 +80,7 @@ model OrderItem {
   drinkId  Int?
   othersId Int?
   quantity Int
-  price    Float
+  price    Float?
   drink    Drink? @relation(fields: [drinkId], references: [id])
   food     Food?  @relation(fields: [foodId], references: [id])
   others   Others? @relation(fields: [othersId], references: [id])

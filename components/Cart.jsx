@@ -8,7 +8,7 @@ import { useCart } from "../app/hooks/useCart";
 export default function Cart() {
   const { currentUser } = useUser();
   const userId = currentUser?.id;
-  const { cart, cartTotal, isLoading, updateQuantity, removeItem } = useCart(userId);
+  const { cart, cartTotal, isLoading, updateQuantity, removeItem, resetCart } = useCart(userId);
 
   if (!currentUser) {
     return (
@@ -137,7 +137,7 @@ export default function Cart() {
             alert(data.error);
             return;
           }
-          cart.reset();
+          resetCart(); // Clear cart on successful order
           alert("Order placed successfully!");
           
         }}
