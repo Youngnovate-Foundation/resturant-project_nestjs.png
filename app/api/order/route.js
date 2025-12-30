@@ -8,10 +8,14 @@ export async function GET() {
   try {
     const orders = await prisma.order.findMany({
       orderBy: {
-        createdAt: "desc",
+        createdAt: "desc", // ✅ sort by time added
       },
       include: {
-        user: true,
+        user: {
+          select: {
+            name: true, // ✅ only username
+          },
+        },
         items: {
           include: {
             food: true,
@@ -31,6 +35,7 @@ export async function GET() {
     );
   }
 }
+
 
 /* =========================
    PATCH: Update order status
