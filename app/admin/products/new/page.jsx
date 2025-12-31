@@ -3,96 +3,142 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-export default function AddProductPage() {
+export default function NewProductPage() {
   const router = useRouter();
+
+  const [type, setType] = useState("FOOD");
   const [name, setName] = useState("");
   const [imageUrl, setImageUrl] = useState("");
+  const [price, setPrice] = useState("");
 
-  const [packages, setPackages] = useState([{ packageName: "", price: "" }]);
+  const [packages, setPackages] = useState([
+    { packageName: "", price: "" },
+  ]);
 
-  const addPackage = () => setPackages([...packages, { packageName: "", price: "" }]);
-  const removePackage = (index) => setPackages(packages.filter((_, i) => i !== index));
-  const updatePackage = (index, field, value) => {
-    const updated = [...packages];
-    updated[index][field] = value;
-    setPackages(updated);
+  const addPackage = () =>
+    setPackages([...packages, { packageName: "", price: "" }]);
+
+  const updatePackage = (i, field, value) => {
+    const copy = [...packages];
+    copy[i][field] = value;
+    setPackages(copy);
   };
 
+  const removePackage = (i) =>
+    setPackages(packages.filter((_, index) => index !== i));
+
   const handleSubmit = async () => {
-    await fetch("/api/food/create", {
+    let url = "";
+    let payload = {};
+
+    if (type === "FOOD") {
+      url = "/api/food/create";
+      payload = { name, imageUrl, packages };
+    }
+
+    if (type === "DRINK") {
+      url = "/api/drink/create";
+      payload = { name, imageUrl, price };
+    }
+
+    if (type === "OTHER") {
+      url = "/api/others/create";
+      payload = { name, imageUrl, price };
+    }
+
+    await fetch(url, {
       method: "POST",
-      body: JSON.stringify({ name, imageUrl, packages }),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
     });
 
-    router.push("/admin/products"); // Redirect after save
+    router.push("/admin/products");
   };
 
   return (
-    <div className="p-6 max-w-lg mx-auto space-y-4">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Add New Product</h1>
+    <div className="p-6 max-w-xl mx-auto">
+      <h1 className="text-2xl font-bold mb-6">Add Product</h1>
 
-        {/* Go Back Button */}
-        <button
-          onClick={() => router.back()}
-          className="bg-gray-300 text-gray-800 px-3 py-1 rounded-md hover:bg-gray-400"
-        >
-          Go Back
-        </button>
-      </div>
+      {/* TYPE */}
+      <select
+        value={type}
+        onChange={(e) => setType(e.target.value)}
+        className="w-full p-3 border rounded mb-4"
+      >
+        <option value="FOOD">Food</option>
+        <option value="DRINK">Drink</option>
+        <option value="OTHER">Other</option>
+      </select>
 
       <input
         value={name}
         onChange={(e) => setName(e.target.value)}
-        placeholder="Product Name"
-        className="w-full p-3 border rounded-md"
+        placeholder="Name"
+        className="w-full p-3 border rounded mb-4"
       />
 
       <input
         value={imageUrl}
         onChange={(e) => setImageUrl(e.target.value)}
         placeholder="Image URL"
-        className="w-full p-3 border rounded-md"
+        className="w-full p-3 border rounded mb-4"
       />
 
-      {/* Packages for Food */}
-      <h2 className="text-lg font-semibold">Packages</h2>
-      {packages.map((pkg, index) => (
-        <div key={index} className="border p-4 rounded-md mb-3">
-          <input
-            value={pkg.packageName}
-            onChange={(e) => updatePackage(index, "packageName", e.target.value)}
-            placeholder="Package Name (e.g. Small, Medium)"
-            className="w-full p-2 border rounded-md mb-2"
-          />
-          <input
-            value={pkg.price}
-            onChange={(e) => updatePackage(index, "price", e.target.value)}
-            placeholder="Price"
-            type="number"
-            className="w-full p-2 border rounded-md mb-2"
-          />
-          {packages.length > 1 && (
-            <button
-              className="text-red-600 text-sm"
-              onClick={() => removePackage(index)}
-            >
-              Remove Package
-            </button>
-          )}
-        </div>
-      ))}
+      {/* FOOD ONLY */}
+      {type === "FOOD" && (
+        <>
+          <h2 className="font-semibold mb-2">Packages</h2>
+          {packages.map((pkg, i) => (
+            <div key={i} className="border p-3 rounded mb-3">
+              <input
+                value={pkg.packageName}
+                onChange={(e) =>
+                  updatePackage(i, "packageName", e.target.value)
+                }
+                placeholder="Package name"
+                className="w-full p-2 border rounded mb-2"
+              />
+              <input
+                value={pkg.price}
+                onChange={(e) => updatePackage(i, "price", e.target.value)}
+                placeholder="Price"
+                type="number"
+                className="w-full p-2 border rounded mb-2"
+              />
+              {packages.length > 1 && (
+                <button
+                  onClick={() => removePackage(i)}
+                  className="text-red-600 text-sm"
+                >
+                  Remove
+                </button>
+              )}
+            </div>
+          ))}
 
-      <button
-        onClick={addPackage}
-        className="w-full bg-gray-200 py-2 rounded-md mb-4"
-      >
-        + Add Package
-      </button>
+          <button
+            onClick={addPackage}
+            className="w-full bg-gray-200 py-2 rounded mb-4"
+          >
+            + Add Package
+          </button>
+        </>
+      )}
+
+      {/* DRINK / OTHER */}
+      {type !== "FOOD" && (
+        <input
+          value={price}
+          onChange={(e) => setPrice(e.target.value)}
+          placeholder="Price"
+          type="number"
+          className="w-full p-3 border rounded mb-4"
+        />
+      )}
 
       <button
         onClick={handleSubmit}
-        className="w-full bg-green-600 text-white py-3 rounded-md hover:bg-green-700"
+        className="w-full bg-green-600 text-white py-3 rounded"
       >
         Save
       </button>
