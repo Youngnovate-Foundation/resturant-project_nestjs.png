@@ -9,7 +9,7 @@ export default function AdminLayout({ children }) {
   const navItems = [
     { name: "Admin Dashboard", href: "/admin/dashboard" },
     { name: "Manage Orders", href: "/admin/orders" },
-    { name: "Manage Foods", href: "/admin/foods" },
+    { name: "Manage Products", href: "/admin/products" },
   ];
 
   return (
@@ -38,7 +38,7 @@ export default function AdminLayout({ children }) {
       </aside>
 
       {/* Main Content */}
-      <div className="flex-1 p-6">
+      <div className="flex-1 p-6 py-20">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-semibold">Admin Dashboard</h2>
           <p className="text-gray-500">Welcome Admin</p>

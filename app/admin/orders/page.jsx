@@ -1,6 +1,7 @@
 "use client";
 
 import { useQuery, useMutation } from "@tanstack/react-query";
+import BackToTop from "@/components/BackToTop";
 
 export default function AdminOrdersPage() {
   /* =========================
@@ -187,6 +188,7 @@ export default function AdminOrdersPage() {
           <span>₵{grandTotal}</span>
         </div>
       </div>
+      <BackToTop />
     </div>
   );
 }
