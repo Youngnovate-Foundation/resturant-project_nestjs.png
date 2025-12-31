@@ -36,7 +36,14 @@ export default function AdminOrdersPage() {
   });
 
   if (isPending) {
-    return <div className="p-6 text-center">Loading orders...</div>;
+    return (
+      <div className="w-full flex justify-center py-40">
+        <div className="p-4 rounded-xl shadow-md bg-white flex items-center space-x-3">
+          <div className="animate-spin rounded-full h-6 w-6 border-4 border-gray-300 border-t-green-500"></div>
+          <span className="font-medium text-gray-700">Loading Orders...</span>
+        </div>
+      </div>
+    );
   }
 
   if (isError) {

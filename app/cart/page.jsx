@@ -20,7 +20,7 @@ export default function CartPage() {
 
   if (!cart.length) {
     return (
-      <div className="p-6 text-center text-gray-600">
+      <div className="p-6 text-center text-gray-600 py-20">
         Your cart is empty.
       </div>
     );
