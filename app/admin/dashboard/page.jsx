@@ -1,10 +1,10 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { Currency, CheckCircle, FastForward } from "lucide-react";
+import { CheckCircle, FastForward, Currency } from "lucide-react";
 
 export default function AdminDashboardPage() {
-  const { data: stats, isLoading } = useQuery({
+  const { data: stats, isLoading: statsLoading } = useQuery({
     queryKey: ["admin-stats"],
     queryFn: async () => {
       const res = await fetch("/api/admin/stats");
@@ -12,7 +12,45 @@ export default function AdminDashboardPage() {
     },
   });
 
-  if (isLoading) {
+  const { data: orders, isLoading: ordersLoading } = useQuery({
+    queryKey: ["admin-orders"],
+    queryFn: async () => {
+      const res = await fetch("/api/order");
+      return res.json();
+    },
+  });
+
+  const { data: foods, isLoading: foodsLoading } = useQuery({
+    queryKey: ["foods"],
+    queryFn: async () => {
+      const res = await fetch("/api/food");
+      return res.json();
+    },
+  });
+
+  const { data: drinks, isLoading: drinksLoading } = useQuery({
+    queryKey: ["drinks"],
+    queryFn: async () => {
+      const res = await fetch("/api/drink");
+      return res.json();
+    },
+  });
+
+  const { data: others, isLoading: othersLoading } = useQuery({
+    queryKey: ["others"],
+    queryFn: async () => {
+      const res = await fetch("/api/others");
+      return res.json();
+    },
+  });
+
+  if (
+    statsLoading ||
+    ordersLoading ||
+    foodsLoading ||
+    drinksLoading ||
+    othersLoading
+  ) {
     return (
       <div className="w-full flex justify-center py-10">
         <div className="p-4 rounded-xl shadow-md bg-white flex items-center space-x-3">
@@ -22,6 +60,29 @@ export default function AdminDashboardPage() {
       </div>
     );
   }
+
+  // Total revenue from completed orders
+  const totalRevenue = orders
+    ?.filter((order) => order.status === "COMPLETED")
+    .reduce(
+      (sum, order) =>
+        sum +
+        order.items.reduce((sub, item) => sub + item.price * item.quantity, 0),
+      0
+    ) ?? 0;
+
+  // Total products available
+  const totalProducts =
+    (foods?.length ?? 0) + (drinks?.length ?? 0) + (others?.length ?? 0);
+
+  // Last 5 orders, sorted by creation date
+  const recentOrders = orders
+    ?.slice()
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    .slice(0, 5);
+
+  const calculateOrderTotal = (order) =>
+    order.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   return (
     <div className="space-y-8">
@@ -49,13 +110,13 @@ export default function AdminDashboardPage() {
           </div>
         </div>
 
-        {/* Foods Available */}
+        {/* Products Available */}
         <div className="bg-white shadow-md p-6 rounded-xl flex items-center space-x-4">
           <Currency className="text-blue-500 w-8 h-8" />
           <div>
-            <p className="text-sm text-gray-500">Foods Available</p>
+            <p className="text-sm text-gray-500">Products Available</p>
             <h3 className="text-2xl font-bold text-gray-800">
-              {stats?.foodCount ?? 0}
+              {totalProducts}
             </h3>
           </div>
         </div>
@@ -65,19 +126,42 @@ export default function AdminDashboardPage() {
           <Currency className="text-green-700 w-8 h-8" />
           <div>
             <p className="text-sm text-gray-500">Revenue (₵)</p>
-            <h3 className="text-2xl font-bold text-gray-800">
-              {stats?.totalRevenue ?? 0}
-            </h3>
+            <h3 className="text-2xl font-bold text-gray-800">{totalRevenue}</h3>
           </div>
         </div>
       </div>
 
-      {/* Optional note about recent orders */}
+      {/* Recent Orders */}
       <div className="bg-white shadow-md p-6 rounded-xl">
-        <h2 className="text-lg font-bold mb-2">Recent Orders</h2>
-        <p className="text-sm text-gray-500">
-          Go to the Orders page to manage orders in detail.
-        </p>
+        <h2 className="text-lg font-bold mb-4">Recent Orders</h2>
+        {recentOrders?.length ? (
+          <div className="space-y-4">
+            {recentOrders.map((order) => (
+              <div
+                key={order.id}
+                className="border rounded-md p-3 flex justify-between items-start"
+              >
+                <div>
+                  <p className="text-sm font-semibold">
+                    Order #{order.id} — {order.status}
+                  </p>
+                  <ul className="text-sm text-gray-600 list-disc ml-5">
+                    {order.items.map((item) => (
+                      <li key={item.id}>
+                        {item.food?.name || item.drink?.name || item.others?.name} × {item.quantity} — ₵{item.price * item.quantity}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div className="font-semibold text-gray-800">
+                  ₵{calculateOrderTotal(order)}
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-sm text-gray-500">No recent orders found.</p>
+        )}
       </div>
     </div>
   );
